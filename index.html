@@ -5,427 +5,623 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hermes Agent — Folder Structure</title>
 <style>
+  /* ===== PEACH THEME ===== */
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
   body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #0d1117;
-    color: #c9d1d9;
-    padding: 40px;
+    font-family: 'Segoe UI', system-ui, -apple-system, 'Inter', sans-serif;
+    background: #FDE8D4;
+    color: #2D3436;
+    padding: 0;
     min-height: 100vh;
   }
-  h1 {
-    font-size: 28px;
-    margin-bottom: 6px;
-    color: #58a6ff;
-    font-weight: 600;
+
+  /* === HEADER === */
+  .hero {
+    background: linear-gradient(135deg, #FAD7A1 0%, #F5CBA7 40%, #E8C8B5 100%);
+    padding: 48px 40px 36px;
+    border-bottom: 1px solid rgba(211, 84, 0, 0.12);
+    position: relative;
+    overflow: hidden;
   }
-  .subtitle {
-    color: #8b949e;
-    font-size: 14px;
-    margin-bottom: 30px;
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: -60%; right: -10%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
   }
+  .hero h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #7B3F00;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1;
+  }
+  .hero h1 span { color: #D35400; }
+  .hero .subtitle {
+    color: #8B5E3C;
+    font-size: 15px;
+    margin-top: 6px;
+    position: relative; z-index: 1;
+  }
+  .hero .subtitle code {
+    background: rgba(123,63,0,0.08);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #7B3F00;
+  }
+
+  /* === MAIN CONTENT === */
+  .content { padding: 32px 40px 60px; max-width: 1200px; margin: 0 auto; }
+
+  /* === LEGEND === */
+  .legend {
+    display: flex; gap: 24px; flex-wrap: wrap;
+    margin-bottom: 28px; padding: 14px 20px;
+    background: #FFF8F2;
+    border-radius: 12px;
+    border: 1px solid #F0D5C5;
+    box-shadow: 0 1px 3px rgba(123,63,0,0.06);
+  }
+  .legend span {
+    font-size: 13px;
+    display: flex; align-items: center; gap: 7px;
+    color: #5D4037;
+  }
+  .legend .dot {
+    display: inline-block; width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .dot-folder { background: #D68910; }
+  .dot-file   { background: #7F8C8D; }
+  .dot-active { background: #27AE60; }
+  .dot-pending { background: #F39C12; }
+
+  /* === SECTION TITLE === */
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #7B3F00;
+    margin: 28px 0 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title .badge {
+    font-size: 11px; font-weight: 600;
+    padding: 2px 10px; border-radius: 20px;
+    background: #FAD7A1; color: #7B3F00;
+  }
+
+  /* === TREE STRUCTURE === */
   .tree { position: relative; padding-left: 28px; }
-  .tree-node { position: relative; margin: 3px 0; }
+  .tree-node { position: relative; margin: 2px 0; }
+
   .tree-node > .label {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 4px 10px; border-radius: 6px;
-    cursor: default; font-size: 14px; line-height: 1.6;
-    transition: background 0.15s;
+    padding: 5px 12px; border-radius: 8px;
+    cursor: default; font-size: 14px; line-height: 1.7;
+    transition: all 0.15s ease;
     position: relative;
   }
-  .tree-node > .label:hover { background: #161b22; }
+  .tree-node > .label:hover {
+    background: rgba(211,84,0,0.07);
+  }
 
   /* Connector lines */
   .tree::before {
     content: ''; position: absolute; left: 12px; top: 0; bottom: 0;
-    width: 1px; background: #30363d;
+    width: 2px; background: #F0D5C5;
   }
   .tree-node > .label::before {
     content: ''; position: absolute; left: -24px; top: 50%;
-    width: 16px; height: 1px; background: #30363d;
+    width: 16px; height: 2px; background: #F0D5C5;
   }
   .tree-node:last-child > .label::after {
     content: ''; position: absolute; left: -24px; top: 50%;
-    bottom: -50%; width: 1px; background: #0d1117;
+    bottom: -50%; width: 2px; background: #FDE8D4;
   }
 
-  /* Icons */
-  .icon-folder { color: #d29922; font-size: 16px; }
-  .icon-file { color: #8b949e; font-size: 14px; }
-  .icon-env { color: #f0db4f; font-size: 14px; }
-  .icon-yaml { color: #6cb4ee; font-size: 14px; }
-  .icon-db { color: #58a6ff; font-size: 14px; }
-  .icon-json { color: #7ee787; font-size: 14px; }
-  .icon-py { color: #3572A5; font-size: 14px; }
-  .icon-md { color: #1f6feb; font-size: 14px; }
-
-  .tag {
-    font-size: 11px; padding: 1px 6px; border-radius: 8px;
-    background: #21262d; color: #8b949e; margin-left: 6px;
-  }
-  .tag-active { background: #1b3a1b; color: #3fb950; }
-  .tag-pending { background: #3d2e00; color: #d29922; }
-  .tag-breaking { background: #3d1a1a; color: #f85149; }
-
-  .desc { color: #484f58; font-size: 12px; margin-left: 4px; }
-  .folder-content {
-    margin: 2px 0; padding-left: 32px; border-left: 1px solid #21262d;
-  }
-
-  /* Collapsible */
+  /* === COLLAPSIBLE === */
   .collapsible { cursor: pointer; user-select: none; }
   .collapsible .arrow {
-    display: inline-block; width: 14px; text-align: center;
-    transition: transform 0.2s; color: #484f58; font-size: 12px;
+    display: inline-block; width: 16px; text-align: center;
+    transition: transform 0.25s ease; color: #D68910; font-size: 11px;
+    font-weight: 700;
   }
   .collapsible.collapsed .arrow { transform: rotate(-90deg); }
   .collapsible.collapsed + .folder-content { display: none; }
+
+  .folder-content {
+    margin: 2px 0; padding-left: 32px;
+    border-left: 2px solid #F0D5C5;
+  }
+
   .files-grid {
     display: flex; flex-direction: column; gap: 2px;
   }
+  .files-grid span {
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: background 0.1s;
+    font-size: 13px;
+  }
+  .files-grid span:hover {
+    background: rgba(211,84,0,0.04);
+  }
 
-  .legend {
+  /* === TAGS === */
+  .tag {
+    font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 20px;
+    margin-left: 6px; letter-spacing: 0.2px;
+  }
+  .tag-file   { background: #EAECEE; color: #5D6D7E; }
+  .tag-active { background: #D5F5E3; color: #1E8449; }
+  .tag-pending { background: #FEF9E7; color: #B7950B; }
+  .tag-telegram { background: #D4E6F1; color: #1A5276; }
+
+  .desc {
+    color: #8B5E3C;
+    font-size: 12px; margin-left: 4px; font-weight: 400;
+  }
+
+  /* === ICONS === */
+  .icon-folder { color: #D68910; font-size: 16px; }
+  .icon-file   { color: #7F8C8D; font-size: 14px; }
+  .icon-env    { color: #D4AC0D; font-size: 14px; }
+  .icon-yaml   { color: #5DADE2; font-size: 14px; }
+  .icon-db     { color: #2E86C1; font-size: 14px; }
+  .icon-json   { color: #58D68D; font-size: 14px; }
+  .icon-py     { color: #2E86C1; font-size: 14px; }
+  .icon-md     { color: #E67E22; font-size: 14px; }
+  .icon-code   { color: #8E44AD; font-size: 14px; }
+
+  /* === CARDS === */
+  .card {
+    background: #FFF8F2;
+    border-radius: 12px;
+    border: 1px solid #F0D5C5;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(123,63,0,0.06);
+  }
+  .card-title {
+    font-size: 14px; font-weight: 600;
+    color: #7B3F00; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* === DIVIDER === */
+  hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #F0D5C5, transparent);
+    margin: 24px 0;
+  }
+
+  /* === FOOTER === */
+  .footer {
+    text-align: center;
+    padding: 24px;
+    color: #A67B5B;
+    font-size: 12px;
+    border-top: 1px solid #F0D5C5;
+    background: #FFF8F2;
+  }
+  .footer a {
+    color: #D35400;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .footer a:hover { text-decoration: underline; }
+
+  /* === STATS BAR === */
+  .stats {
     display: flex; gap: 20px; flex-wrap: wrap;
-    margin-bottom: 24px; padding: 12px 16px;
-    background: #161b22; border-radius: 8px; border: 1px solid #21262d;
+    padding: 16px 0;
   }
-  .legend span { font-size: 12px; display: flex; align-items: center; gap: 6px; color: #8b949e; }
-
-  hr { border: none; border-top: 1px solid #21262d; margin: 20px 0; }
-
-  .section-title {
-    font-size: 16px; font-weight: 600; color: #58a6ff;
-    margin: 16px 0 8px; display: flex; align-items: center; gap: 8px;
+  .stat-item {
+    display: flex; align-items: center; gap: 8px;
+    background: #FFF8F2;
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: 1px solid #F0D5C5;
+    font-size: 13px; color: #5D4037;
   }
+  .stat-item strong {
+    color: #D35400;
+    font-size: 18px;
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 768px) {
+    .hero { padding: 32px 20px 28px; }
+    .hero h1 { font-size: 24px; }
+    .content { padding: 20px 16px; }
+    .tree { padding-left: 20px; }
+    .folder-content { padding-left: 20px; }
+    .stats { flex-direction: column; }
+  }
+
+  /* === ANIMATIONS === */
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .tree-node { animation: fadeSlideIn 0.25s ease both; }
+  .tree-node:nth-child(1) { animation-delay: 0.02s; }
+  .tree-node:nth-child(2) { animation-delay: 0.04s; }
+  .tree-node:nth-child(3) { animation-delay: 0.06s; }
+  .tree-node:nth-child(4) { animation-delay: 0.08s; }
+  .tree-node:nth-child(5) { animation-delay: 0.10s; }
+  .tree-node:nth-child(6) { animation-delay: 0.12s; }
+  .tree-node:nth-child(7) { animation-delay: 0.14s; }
+  .tree-node:nth-child(8) { animation-delay: 0.16s; }
+  .tree-node:nth-child(9) { animation-delay: 0.18s; }
+  .tree-node:nth-child(10) { animation-delay: 0.20s; }
 </style>
 </head>
 <body>
 
-<h1>🏗️ Hermes Agent — Folder Structure</h1>
-<div class="subtitle">Windows • <code>C:\Users\kevin\AppData\Local\hermes\</code></div>
-
-<div class="legend">
-  <span>📁 Folder</span>
-  <span>📄 File</span>
-  <span>🟢 Active</span>
-  <span>🟡 Pending</span>
-  <span>🔴 Stopped</span>
-</div>
-
-<!-- ==================== ROOT ==================== -->
-<div class="section-title">📂 Root Files</div>
-<div class="files-grid">
-
-<div class="tree-node"><span class="label"><span class="icon-env">🔑</span> .env <span class="tag">23K</span><span class="desc">— API keys: DEEPSEEK, GOOGLE, TELEGRAM, OPENROUTER</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-yaml">⚙️</span> config.yaml <span class="tag">18K</span><span class="desc">— Main configuration</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-db">🗄️</span> state.db <span class="tag">26M</span><span class="desc">— Session store (SQLite)</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-db">📋</span> kanban.db <span class="tag">112K</span><span class="desc">— Kanban board</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-json">🔐</span> auth.json <span class="tag">7K</span><span class="desc">— OAuth credentials</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-json">📡</span> channel_directory.json <span class="tag">3K</span><span class="desc">— Connected channels</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-json">🧠</span> models_dev_cache.json <span class="tag">2.3M</span><span class="desc">— Available models cache</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-json">🔑</span> google_client_secret.json <span class="tag">428B</span><span class="desc">— Google OAuth</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-json">🔄</span> provider_models_cache.json <span class="tag">735B</span><span class="desc">— Provider model list</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-json">⚡</span> gateway_state.json <span class="tag">428B</span><span class="desc">— Gateway state</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-json">📊</span> processes.json <span class="tag">2B</span><span class="desc">— Background processes</span></span></div>
-
-</div>
-
-<hr>
-
-<!-- ==================== L1 FOLDERS ==================== -->
-<div class="section-title">📁 Root Folders</div>
-<div class="tree">
-
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> profiles/ <span class="tag">10 profiles</span>
+<!-- ===== HERO HEADER ===== -->
+<div class="hero">
+  <h1>🏗️ Hermes <span>Agent</span></h1>
+  <div class="subtitle">
+    Folder Structure &nbsp;·&nbsp;
+    <code>C:\Users\kevin\AppData\Local\hermes\</code>
   </div>
-  <div class="folder-content">
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> roronoa-zorro/ <span class="tag tag-active">✅ Active</span>
-      </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
-        <span><span class="icon-file">📄</span> state.db, auth.json, gateway_state.json</span>
-        <span><span class="icon-folder">📁</span> memories/ → MEMORY.md, USER.md</span>
-        <span><span class="icon-folder">📁</span> logs/, sessions/, skills/, cron/, home/</span>
-        <span><span class="icon-folder">📁</span> cache/, workspace/, plans/, hooks/</span>
-        <span><span class="icon-folder">📁</span> audio_cache/, image_cache/, skins/, pairing/</span>
-        <span><span class="icon-folder">📁</span> gateway-service/</span>
-      </div>
-    </div>
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> nami/ <span class="tag tag-active">✅ Active</span>
-      </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md + lsp/</span>
-        <span><span class="icon-folder">📁</span> Same subdirs + ocr_batch.sh</span>
-      </div>
-    </div>
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> usopp/ <span class="tag tag-active">✅ Active</span>
-      </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
-        <span><span class="icon-folder">📁</span> Same subdirs</span>
-      </div>
-    </div>
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> sanji/ <span class="tag tag-active">✅ Active</span>
-      </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
-        <span><span class="icon-folder">📁</span> Same subdirs</span>
-      </div>
-    </div>
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> chopper/ <span class="tag tag-active">✅ Active</span>
-      </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
-        <span><span class="icon-folder">📁</span> Same subdirs</span>
-      </div>
-    </div>
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> robin/ <span class="tag tag-active">✅ Telegram</span>
-      </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md + lsp/</span>
-        <span><span class="icon-folder">📁</span> Same subdirs</span>
-      </div>
-    </div>
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> brook/ <span class="tag tag-active">✅ Telegram</span>
-      </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
-        <span><span class="icon-folder">📁</span> Same subdirs</span>
-      </div>
-    </div>
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> franky/ <span class="tag tag-active">✅ Telegram</span>
-      </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
-        <span><span class="icon-folder">📁</span> Same subdirs</span>
-      </div>
-    </div>
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> jinbei/ <span class="tag tag-pending">⏳ Pending</span>
-      </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md + lsp/</span>
-        <span><span class="icon-folder">📁</span> Same subdirs (tunggu group ID)</span>
-      </div>
+</div>
+
+<!-- ===== CONTENT ===== -->
+<div class="content">
+
+  <!-- Legend -->
+  <div class="legend">
+    <span><span class="dot dot-folder"></span> Folder</span>
+    <span><span class="dot dot-file"></span> File</span>
+    <span><span class="dot dot-active"></span> Active</span>
+    <span><span class="dot dot-pending"></span> Pending</span>
+    <span>📄 Config</span>
+    <span>🔐 Auth</span>
+    <span>🗄️ Database</span>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-item"><strong>14</strong> Root Files</div>
+    <div class="stat-item"><strong>19</strong> L1 Folders</div>
+    <div class="stat-item"><strong>9</strong> Profiles</div>
+    <div class="stat-item"><strong>1</strong> LLM Wiki</div>
+  </div>
+
+  <!-- ======================= ROOT FILES ======================= -->
+  <div class="section-title">📂 Root Files</div>
+  <div class="card">
+    <div class="files-grid">
+      <div class="tree-node"><span class="label"><span class="icon-env">🔑</span> .env <span class="tag tag-file">23K</span><span class="desc">— API keys: DEEPSEEK, GOOGLE, TELEGRAM, OPENROUTER</span></span></div>
+      <div class="tree-node"><span class="label"><span class="icon-yaml">⚙️</span> config.yaml <span class="tag tag-file">18K</span><span class="desc">— Main configuration</span></span></div>
+      <div class="tree-node"><span class="label"><span class="icon-db">🗄️</span> state.db <span class="tag tag-file">26M</span><span class="desc">— Session store (SQLite)</span></span></div>
+      <div class="tree-node"><span class="label"><span class="icon-db">📋</span> kanban.db <span class="tag tag-file">112K</span><span class="desc">— Kanban board</span></span></div>
+      <div class="tree-node"><span class="label"><span class="icon-json">🔐</span> auth.json <span class="tag tag-file">7K</span><span class="desc">— OAuth credentials</span></span></div>
+      <div class="tree-node"><span class="label"><span class="icon-json">📡</span> channel_directory.json <span class="tag tag-file">3K</span><span class="desc">— Connected channels</span></span></div>
+      <div class="tree-node"><span class="label"><span class="icon-json">🧠</span> models_dev_cache.json <span class="tag tag-file">2.3M</span><span class="desc">— Available models cache</span></span></div>
+      <div class="tree-node"><span class="label"><span class="icon-json">🔑</span> google_client_secret.json <span class="tag tag-file">428B</span><span class="desc">— Google OAuth</span></span></div>
+      <div class="tree-node"><span class="label"><span class="icon-json">🔄</span> provider_models_cache.json <span class="tag tag-file">770B</span><span class="desc">— Provider model list</span></span></div>
+      <div class="tree-node"><span class="label"><span class="icon-json">⚡</span> gateway_state.json <span class="tag tag-file">428B</span><span class="desc">— Gateway state</span></span></div>
+      <div class="tree-node"><span class="label"><span class="icon-json">📊</span> processes.json <span class="tag tag-file">2B</span><span class="desc">— Background processes</span></span></div>
+      <div class="tree-node"><span class="label"><span class="icon-json">⏳</span> ollama_cloud_models_cache.json <span class="tag tag-file">724B</span><span class="desc">— Ollama cloud cache</span></span></div>
+      <div class="tree-node"><span class="label"><span class="icon-json">🔑</span> google_oauth_pending.json <span class="tag tag-file">242B</span><span class="desc">— Pending OAuth</span></span></div>
     </div>
   </div>
+
+  <hr>
+
+  <!-- ======================= L1 FOLDERS ======================= -->
+  <div class="section-title">📁 Root Folders</div>
+
+  <!-- PROFILES -->
+  <div class="card">
+    <div class="tree">
+      <div class="tree-node">
+        <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
+          <span class="arrow">▼</span><span class="icon-folder">📁</span> profiles/ <span class="tag tag-file">10 profiles</span>
+        </div>
+        <div class="folder-content">
+          <div class="tree-node">
+            <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
+              <span class="arrow">▼</span><span class="icon-folder">📁</span> roronoa-zorro/ <span class="tag tag-active">✅ Active</span>
+            </div>
+            <div class="folder-content files-grid">
+              <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
+              <span><span class="icon-file">📄</span> state.db, auth.json, gateway_state.json</span>
+              <span><span class="icon-folder">📁</span> memories/ → MEMORY.md, USER.md</span>
+              <span><span class="icon-folder">📁</span> logs/, sessions/, skills/, cron/, home/</span>
+              <span><span class="icon-folder">📁</span> cache/, workspace/, plans/, hooks/</span>
+              <span><span class="icon-folder">📁</span> audio_cache/, image_cache/, skins/, pairing/</span>
+              <span><span class="icon-folder">📁</span> gateway-service/</span>
+            </div>
+          </div>
+          <div class="tree-node">
+            <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
+              <span class="arrow">▼</span><span class="icon-folder">📁</span> nami/ <span class="tag tag-active">✅ Active</span>
+            </div>
+            <div class="folder-content files-grid">
+              <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
+              <span><span class="icon-folder">📁</span> Same subdirs <span class="desc">+ lsp/, ocr_batch.sh</span></span>
+            </div>
+          </div>
+          <div class="tree-node">
+            <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
+              <span class="arrow">▼</span><span class="icon-folder">📁</span> usopp/ <span class="tag tag-active">✅ Active</span>
+            </div>
+            <div class="folder-content files-grid">
+              <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
+              <span><span class="icon-folder">📁</span> Same subdirs</span>
+            </div>
+          </div>
+          <div class="tree-node">
+            <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
+              <span class="arrow">▼</span><span class="icon-folder">📁</span> sanji/ <span class="tag tag-active">✅ Active</span>
+            </div>
+            <div class="folder-content files-grid">
+              <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
+              <span><span class="icon-folder">📁</span> Same subdirs</span>
+            </div>
+          </div>
+          <div class="tree-node">
+            <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
+              <span class="arrow">▼</span><span class="icon-folder">📁</span> chopper/ <span class="tag tag-active">✅ Active</span>
+            </div>
+            <div class="folder-content files-grid">
+              <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
+              <span><span class="icon-folder">📁</span> Same subdirs</span>
+            </div>
+          </div>
+          <div class="tree-node">
+            <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
+              <span class="arrow">▼</span><span class="icon-folder">📁</span> robin/ <span class="tag tag-telegram">📲 Telegram</span>
+            </div>
+            <div class="folder-content files-grid">
+              <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
+              <span><span class="icon-folder">📁</span> Same subdirs <span class="desc">+ lsp/</span></span>
+            </div>
+          </div>
+          <div class="tree-node">
+            <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
+              <span class="arrow">▼</span><span class="icon-folder">📁</span> brook/ <span class="tag tag-telegram">📲 Telegram</span>
+            </div>
+            <div class="folder-content files-grid">
+              <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
+              <span><span class="icon-folder">📁</span> Same subdirs</span>
+            </div>
+          </div>
+          <div class="tree-node">
+            <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
+              <span class="arrow">▼</span><span class="icon-folder">📁</span> franky/ <span class="tag tag-telegram">📲 Telegram</span>
+            </div>
+            <div class="folder-content files-grid">
+              <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
+              <span><span class="icon-folder">📁</span> Same subdirs</span>
+            </div>
+          </div>
+          <div class="tree-node">
+            <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
+              <span class="arrow">▼</span><span class="icon-folder">📁</span> jinbei/ <span class="tag tag-pending">⏳ Pending</span>
+            </div>
+            <div class="folder-content files-grid">
+              <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
+              <span><span class="icon-folder">📁</span> Same subdirs <span class="desc">+ lsp/ (tunggu group ID)</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OTHER L1 FOLDERS -->
+  <div class="card">
+    <div class="tree">
+
+      <div class="tree-node">
+        <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
+          <span class="arrow">▼</span><span class="icon-folder">📁</span> logs/ <span class="tag tag-file">~700K</span>
+        </div>
+        <div class="folder-content files-grid">
+          <span><span class="icon-file">📄</span> gateway.log — Gateway activity</span>
+          <span><span class="icon-file">📄</span> agent.log — Agent interactions</span>
+          <span><span class="icon-file">📄</span> errors.log — Error logs</span>
+          <span><span class="icon-file">📄</span> desktop.log — Desktop app logs</span>
+          <span><span class="icon-file">📄</span> gui.log — GUI logs</span>
+          <span><span class="icon-file">📄</span> gateway-stdio.log — Gateway stdio</span>
+          <span><span class="icon-file">📄</span> gateway-exit-diag.log — Exit diagnostics</span>
+          <span><span class="icon-folder">📁</span> curator/ — Curator logs</span>
+        </div>
+      </div>
+
+      <div class="tree-node">
+        <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
+          <span class="arrow">▼</span><span class="icon-folder">📁</span> cache/ <span class="tag tag-file">~226K</span>
+        </div>
+        <div class="folder-content files-grid">
+          <span><span class="icon-folder">📁</span> documents/ — Cached documents</span>
+          <span><span class="icon-folder">📁</span> terminal/ — Terminal cache</span>
+          <span><span class="icon-file">📄</span> model_catalog.json — Model catalog</span>
+          <span><span class="icon-file">📄</span> openrouter_model_metadata.json — OR metadata</span>
+        </div>
+      </div>
+
+      <div class="tree-node">
+        <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
+          <span class="arrow">▼</span><span class="icon-folder">📁</span> skills/ <span class="tag tag-file">19 categories</span>
+        </div>
+        <div class="folder-content files-grid">
+          <span><span class="icon-folder">📁</span> autonomous-ai-agents/ &nbsp; creative/ &nbsp; data-science/</span>
+          <span><span class="icon-folder">📁</span> devops/ &nbsp; dogfood/ &nbsp; email/ &nbsp; github/ &nbsp; media/</span>
+          <span><span class="icon-folder">📁</span> mlops/ &nbsp; note-taking/ &nbsp; productivity/ &nbsp; research/</span>
+          <span><span class="icon-folder">📁</span> smart-home/ &nbsp; social-media/ &nbsp; software-development/</span>
+          <span><span class="icon-folder">📁</span> apple/ &nbsp; context-aware-saver/ &nbsp; yuanbao/</span>
+        </div>
+      </div>
+
+      <div class="tree-node">
+        <div class="label"><span class="icon-folder">📁</span> sessions/ <span class="tag tag-file">N dump files</span><span class="desc">— request_dump_*.json</span></div>
+      </div>
+      <div class="tree-node">
+        <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
+          <span class="arrow">▼</span><span class="icon-folder">📁</span> memories/ <span class="tag tag-file">Default profile</span>
+        </div>
+        <div class="folder-content files-grid">
+          <span><span class="icon-md">📝</span> MEMORY.md — Agent cross-session memory</span>
+          <span><span class="icon-md">👤</span> USER.md — User profile & preferences</span>
+        </div>
+      </div>
+
+      <div class="tree-node">
+        <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
+          <span class="arrow">▼</span><span class="icon-folder">📁</span> cron/ <span class="tag tag-file">Scheduled jobs</span>
+        </div>
+        <div class="folder-content files-grid">
+          <span><span class="icon-file">📄</span> jobs.json — Job definitions</span>
+          <span><span class="icon-folder">📁</span> output/ — Job output files</span>
+        </div>
+      </div>
+
+      <div class="tree-node">
+        <div class="label"><span class="icon-folder">📁</span> plugins/ <span class="desc">— Custom plugins (e.g. rtk-rewrite)</span></div>
+      </div>
+      <div class="tree-node">
+        <div class="label"><span class="icon-folder">📁</span> scripts/ <span class="desc">— Custom automation scripts</span></div>
+      </div>
+      <div class="tree-node">
+        <div class="label"><span class="icon-folder">📁</span> hooks/ <span class="desc">— Event hooks</span></div>
+      </div>
+      <div class="tree-node">
+        <div class="label"><span class="icon-folder">📁</span> audio_cache/ <span class="desc">— TTS audio cache</span></div>
+      </div>
+      <div class="tree-node">
+        <div class="label"><span class="icon-folder">📁</span> image_cache/ <span class="desc">— Image cache</span></div>
+      </div>
+      <div class="tree-node">
+        <div class="label"><span class="icon-folder">📁</span> pairing/ <span class="desc">— Device pairing info</span></div>
+      </div>
+      <div class="tree-node">
+        <div class="label"><span class="icon-folder">📁</span> sandboxes/ <span class="desc">— Sandbox environments</span></div>
+      </div>
+      <div class="tree-node">
+        <div class="label"><span class="icon-folder">📁</span> lsp/ <span class="desc">— Language Server Protocol</span></div>
+      </div>
+      <div class="tree-node">
+        <div class="label"><span class="icon-folder">📁</span> bin/ <span class="desc">— uv.exe, uvw.exe, uvx.exe</span></div>
+      </div>
+      <div class="tree-node">
+        <div class="label"><span class="icon-folder">📁</span> bootstrap-cache/ <span class="desc">— Bootstrap install scripts</span></div>
+      </div>
+      <div class="tree-node">
+        <div class="label"><span class="icon-folder">📁</span> gateway-service/ <span class="desc">— Hermes_Gateway.cmd, .vbs, setup-task.ps1</span></div>
+      </div>
+      <div class="tree-node">
+        <div class="label"><span class="icon-folder">📁</span> hermes-agent/ <span class="desc">— Source code (Git repo)</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ======================= LLM WIKI ======================= -->
+  <div class="section-title">📖 LLM Wiki — <code style="font-size:14px;color:#D35400;">C:\Users\kevin\wiki\</code></div>
+  <div class="card">
+    <div class="tree">
+
+      <div class="tree-node">
+        <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
+          <span class="arrow">▼</span><span class="icon-folder">📁</span> concepts/ <span class="desc">— Knowledge concept files</span>
+        </div>
+        <div class="folder-content files-grid">
+          <span><span class="icon-md">📝</span> *.md files (individual concepts & topics)</span>
+        </div>
+      </div>
+      <div class="tree-node"><div class="label"><span class="icon-folder">📁</span> comparisons/ <span class="desc">— Perbandingan model & tools</span></div></div>
+      <div class="tree-node"><div class="label"><span class="icon-folder">📁</span> entities/ <span class="desc">— Entity definitions</span></div></div>
+      <div class="tree-node"><div class="label"><span class="icon-folder">📁</span> queries/ <span class="desc">— Saved semantic queries</span></div></div>
+      <div class="tree-node"><div class="label"><span class="icon-folder">📁</span> raw/ <span class="desc">— Source articles & references</span></div></div>
+      <div class="tree-node"><div class="label"><span class="icon-folder">📁</span> temp_ocr/ <span class="desc">— OCR temporary files</span></div></div>
+      <div class="tree-node"><div class="label"><span class="icon-folder">📁</span> _vectors/ <span class="desc">— Vector embeddings store</span></div></div>
+      <div class="tree-node"><div class="label"><span class="icon-folder">📁</span> .git/ <span class="desc">— Version controlled</span></div></div>
+
+      <div class="tree-node">
+        <div class="label"><span class="icon-md">📝</span> index.md <span class="desc">— Wiki index & navigation</span></div>
+      </div>
+      <div class="tree-node">
+        <div class="label"><span class="icon-md">📝</span> log.md <span class="desc">— Change tracking log</span></div>
+      </div>
+      <div class="tree-node">
+        <div class="label"><span class="icon-md">📝</span> SCHEMA.md <span class="desc">— Wiki structure & schema</span></div>
+      </div>
+      <div class="tree-node">
+        <div class="label"><span class="icon-py">🐍</span> _health.py, _search.py, _reindex.py, _kg.py <span class="desc">— Utility scripts</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ======================= PER-PROFILE TEMPLATE ======================= -->
+  <div class="section-title">📁 Per-Profile Structure Template</div>
+  <div class="card">
+    <div class="tree">
+      <div class="tree-node">
+        <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
+          <span class="arrow">▼</span><span class="icon-folder">📁</span> profiles/&lt;nama&gt;/
+        </div>
+        <div class="folder-content files-grid">
+          <span><span class="icon-env">🔑</span> .env — Profile API keys & bot tokens</span>
+          <span><span class="icon-yaml">⚙️</span> config.yaml — Gateway & model config</span>
+          <span><span class="icon-md">🧬</span> SOUL.md — Profile identity & character</span>
+          <span><span class="icon-db">🗄️</span> state.db — Local session SQLite DB</span>
+          <span><span class="icon-json">🔐</span> auth.json — Auth tokens</span>
+          <span><span class="icon-file">📄</span> gateway.lock, gateway.pid, gateway_state.json</span>
+          <span><span class="icon-json">🧠</span> models_dev_cache.json</span>
+          <span><span class="icon-json">📡</span> channel_directory.json</span>
+          <span style="margin-top:4px;"><span class="icon-folder">📁</span> <strong>memories/</strong></span>
+          <span style="padding-left:28px;"><span class="icon-md">📝</span> MEMORY.md — Agent memory (env, tools, facts)</span>
+          <span style="padding-left:28px;"><span class="icon-md">👤</span> USER.md — User profile & preferences</span>
+          <span style="margin-top:4px;"><span class="icon-folder">📁</span> logs/ — gateway.log, agent.log, errors.log</span>
+          <span><span class="icon-folder">📁</span> sessions/ &nbsp; skills/ &nbsp; cron/ &nbsp; home/</span>
+          <span><span class="icon-folder">📁</span> cache/ &nbsp; workspace/ &nbsp; plans/ &nbsp; hooks/</span>
+          <span><span class="icon-folder">📁</span> audio_cache/ &nbsp; image_cache/ &nbsp; skins/ &nbsp; pairing/</span>
+          <span><span class="icon-folder">📁</span> lsp/ <span class="desc">(some profiles)</span></span>
+          <span><span class="icon-folder">📁</span> gateway-service/ <span class="desc">(some profiles)</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> logs/ <span class="tag">~700K</span>
-  </div>
-  <div class="folder-content files-grid">
-    <span><span class="icon-file">📄</span> gateway.log — Gateway activity</span>
-    <span><span class="icon-file">📄</span> agent.log — Agent interactions</span>
-    <span><span class="icon-file">📄</span> errors.log — Error logs</span>
-    <span><span class="icon-file">📄</span> desktop.log — Desktop app logs</span>
-    <span><span class="icon-file">📄</span> gui.log — GUI logs</span>
-    <span><span class="icon-file">📄</span> gateway-stdio.log — Gateway stdio</span>
-    <span><span class="icon-file">📄</span> gateway-exit-diag.log — Exit diagnostics</span>
-    <span><span class="icon-folder">📁</span> curator/ — Curator logs</span>
-  </div>
-</div>
-
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> cache/ <span class="tag">~226K</span>
-  </div>
-  <div class="folder-content files-grid">
-    <span><span class="icon-folder">📁</span> documents/ — Cached documents</span>
-    <span><span class="icon-folder">📁</span> terminal/ — Terminal cache</span>
-    <span><span class="icon-file">📄</span> model_catalog.json — Model catalog</span>
-    <span><span class="icon-file">📄</span> openrouter_model_metadata.json — OR metadata</span>
-  </div>
-</div>
-
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> skills/ <span class="tag">19 categories</span>
-  </div>
-  <div class="folder-content files-grid">
-    <span><span class="icon-folder">📁</span> autonomous-ai-agents/, creative/, data-science/</span>
-    <span><span class="icon-folder">📁</span> devops/, dogfood/, email/, github/, media/</span>
-    <span><span class="icon-folder">📁</span> mlops/, note-taking/, productivity/, research/</span>
-    <span><span class="icon-folder">📁</span> smart-home/, social-media/, software-development/</span>
-    <span><span class="icon-folder">📁</span> apple/, context-aware-saver/, yuanbao/</span>
-  </div>
-</div>
-
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> sessions/ <span class="tag">N dump files</span>
-  </div>
-  <div class="folder-content files-grid">
-    <span><span class="icon-file">📄</span> request_dump_*.json — Session request dumps</span>
-  </div>
-</div>
-
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> memories/ <span class="tag">Default profile</span>
-  </div>
-  <div class="folder-content files-grid">
-    <span><span class="icon-md">📝</span> MEMORY.md — Agent memory</span>
-    <span><span class="icon-md">👤</span> USER.md — User profile</span>
-  </div>
-</div>
-
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> cron/ <span class="tag">Scheduled jobs</span>
-  </div>
-  <div class="folder-content files-grid">
-    <span><span class="icon-file">📄</span> jobs.json — Job definitions</span>
-    <span><span class="icon-folder">📁</span> output/ — Job output files</span>
-  </div>
-</div>
-
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> plugins/ <span class="tag">Custom</span><span class="desc">— e.g. rtk-rewrite</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> scripts/ <span class="tag">Custom scripts</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> hooks/ <span class="tag">Event hooks</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> audio_cache/ <span class="tag">TTS cache</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> image_cache/ <span class="tag">Image cache</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> pairing/ <span class="tag">Device pairing</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> sandboxes/ <span class="tag">Sandbox envs</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> lsp/ <span class="tag">LSP</span><span class="desc">— Language Server Protocol</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> bin/ <span class="tag">uv</span><span class="desc">— uv.exe, uvw.exe, uvx.exe</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> bootstrap-cache/ <span class="tag">Setup scripts</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> gateway-service/ <span class="tag">Windows</span><span class="desc">— Hermes_Gateway.cmd, .vbs, setup-task.ps1</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> hermes-agent/ <span class="tag">Git repo</span><span class="desc">— Source code</span></div>
-</div>
-
-</div>
-
-<hr>
-
-<!-- ==================== WIKI ==================== -->
-<div class="section-title">📖 LLM Wiki — <code>C:\Users\kevin\wiki\</code></div>
-<div class="tree">
-
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> concepts/ <span class="desc">— Knowledge concept files</span>
-  </div>
-  <div class="folder-content files-grid">
-    <span><span class="icon-md">📝</span> *.md files</span>
-  </div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> comparisons/ <span class="desc">— Perbandingan</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> entities/ <span class="desc">— Entity definitions</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> queries/ <span class="desc">— Saved queries</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> raw/ <span class="desc">— Source articles</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> temp_ocr/ <span class="desc">— OCR temp files</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-md">📝</span> index.md <span class="desc">— Wiki index</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-md">📝</span> log.md <span class="desc">— Change log</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-md">📝</span> SCHEMA.md <span class="desc">— Wiki structure</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-py">🐍</span> _health.py, _search.py, _reindex.py, _kg.py</div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> _vectors/ <span class="desc">— Vector store</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> .git/ <span class="desc">— Version controlled</span></div>
-</div>
-
-</div>
-
-<hr>
-
-<!-- ===================== PROFILE ===================== -->
-<div class="section-title">📁 Per-Profile Structure Template</div>
-<div class="tree">
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> profiles/&lt;nama&gt;/
-  </div>
-  <div class="folder-content files-grid">
-    <span><span class="icon-env">🔑</span> .env — Profile API keys & tokens</span>
-    <span><span class="icon-yaml">⚙️</span> config.yaml — Profile configuration</span>
-    <span><span class="icon-md">🧬</span> SOUL.md — Identity & character</span>
-    <span><span class="icon-db">🗄️</span> state.db — Local session DB</span>
-    <span><span class="icon-json">🔐</span> auth.json — Auth tokens</span>
-    <span><span class="icon-file">📄</span> gateway.lock, gateway.pid, gateway_state.json</span>
-    <span><span class="icon-json">🧠</span> models_dev_cache.json</span>
-    <span><span class="icon-json">📡</span> channel_directory.json</span>
-    <span><span class="icon-folder">📁</span> memories/ → MEMORY.md + USER.md</span>
-    <span><span class="icon-folder">📁</span> logs/ — gateway.log, agent.log, errors.log</span>
-    <span><span class="icon-folder">📁</span> sessions/, skills/, cron/, home/</span>
-    <span><span class="icon-folder">📁</span> cache/, workspace/, plans/, hooks/</span>
-    <span><span class="icon-folder">📁</span> audio_cache/, image_cache/, skins/, pairing/</span>
-    <span><span class="icon-folder">📁</span> lsp/ (some), gateway-service/ (some)</span>
-  </div>
-</div>
+<!-- ===== FOOTER ===== -->
+<div class="footer">
+  Hermes Agent &nbsp;·&nbsp; <a href="https://kevingenautry-lgtm.github.io/hermes-structure/">kevingenautry-lgtm.github.io/hermes-structure/</a>
+  &nbsp;·&nbsp; Generated from live scan
 </div>
 
 <script>
-  // Collapse all profile subfolders by default for cleaner view
   document.addEventListener('DOMContentLoaded', function() {
-    // Keep profiles expanded but collapse individual profile contents
+    // Collapse deeper nested items (individual profile contents)
     document.querySelectorAll('.collapsible').forEach(function(el) {
-      // Only collapse deeper nested items, not the top level
-      if (el.closest('.folder-content') && el.closest('.folder-content').closest('.folder-content')) {
-        el.classList.add('collapsed');
+      var depth = 0;
+      var p = el.parentElement;
+      while (p) {
+        if (p.classList.contains('folder-content')) depth++;
+        p = p.parentElement;
       }
+      // Collapse items at depth 2+ (profile subfolders)
+      if (depth >= 2) el.classList.add('collapsed');
     });
   });
 </script>
