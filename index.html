@@ -3,1138 +3,1030 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LLM Wiki Upgraded — Interactive Overview</title>
+<title>LLM Wiki — v3.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #FDE8D4;
-    color: #2D3436;
-    padding: 0;
-    min-height: 100vh;
-  }
+:root {
+  --bg: #F7F2ED;
+  --surface: #FFFFFF;
+  --surface-hover: #FAF6F1;
+  --border: #E8DDD2;
+  --border-light: #F0E8DF;
+  --text: #2C2420;
+  --text-secondary: #7A6B5E;
+  --text-tertiary: #A89B8E;
+  --accent: #C8511E;
+  --accent-hover: #B04315;
+  --accent-light: #FDF0E8;
+  --green: #1E8B4C;
+  --green-light: #E6F5ED;
+  --amber: #C8901A;
+  --amber-light: #FDF6E3;
+  --blue: #1A6B8B;
+  --blue-light: #E5F2F7;
+  --red: #B34332;
+  --red-light: #F8EAE7;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(44,36,32,.06), 0 1px 2px rgba(44,36,32,.04);
+  --shadow-md: 0 4px 12px rgba(44,36,32,.08);
+  --transition: .2s cubic-bezier(.4,0,.2,1);
+}
 
-  /* === HERO === */
-  .hero {
-    background: linear-gradient(135deg, #FAD7A1 0%, #F5CBA7 40%, #E8C8B5 100%);
-    padding: 48px 40px 40px;
-    border-bottom: 1px solid rgba(211, 84, 0, 0.12);
-    position: relative;
-    overflow: hidden;
-  }
-  .hero::after {
-    content: '';
-    position: absolute;
-    top: -60%; right: -10%;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-  }
-  .hero h1 {
-    font-size: 32px;
-    font-weight: 700;
-    color: #7B3F00;
-    letter-spacing: -0.5px;
-    position: relative;
-    z-index: 1;
-  }
-  .hero h1 span { color: #D35400; }
-  .hero .subtitle {
-    color: #8B5E3C;
-    font-size: 15px;
-    margin-top: 6px;
-    position: relative; z-index: 1;
-  }
-  .hero .version-badge {
-    display: inline-block;
-    margin-top: 12px;
-    padding: 4px 14px;
-    background: #D35400;
-    color: #fff;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    position: relative;
-    z-index: 1;
-  }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
-  /* === STATS BAR === */
-  .stats {
-    display: flex; gap: 16px; flex-wrap: wrap;
-    padding: 20px 40px;
-    background: #FFF8F2;
-    border-bottom: 1px solid #F0D5C5;
-  }
-  .stat-item {
-    display: flex; flex-direction: column; align-items: center;
-    background: #FFF;
-    padding: 12px 20px;
-    border-radius: 10px;
-    border: 1px solid #F0D5C5;
-    min-width: 100px;
-    box-shadow: 0 1px 3px rgba(123,63,0,0.06);
-    transition: transform 0.15s;
-  }
-  .stat-item:hover { transform: translateY(-2px); }
-  .stat-item strong {
-    color: #D35400;
-    font-size: 24px;
-  }
-  .stat-item span {
-    color: #8B5E3C;
-    font-size: 12px;
-    margin-top: 2px;
-  }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
 
-  /* === CONTENT === */
-  .content { padding: 32px 40px 60px; max-width: 1200px; margin: 0 auto; }
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(247,242,237,.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  height: 56px;
+  gap: 8px;
+}
+nav .logo { font-weight: 700; font-size: 15px; color: var(--accent); margin-right: auto; }
+nav a {
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+nav a:hover { color: var(--text); background: var(--surface-hover); }
+nav a.active { color: var(--accent); background: var(--accent-light); }
 
-  /* === SECTION TITLE === */
-  .section-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #7B3F00;
-    margin: 32px 0 16px;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .section-title .badge {
-    font-size: 11px; font-weight: 600;
-    padding: 2px 10px; border-radius: 20px;
-    background: #FAD7A1; color: #7B3F00;
-  }
+/* ── HERO ── */
+.hero {
+  padding: 72px 32px 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+.hero-left h1 {
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -.03em;
+  line-height: 1.15;
+  color: var(--text);
+}
+.hero-left h1 span { color: var(--accent); }
+.hero-left p {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin: 16px 0 24px;
+  max-width: 480px;
+  line-height: 1.7;
+}
+.hero-tags {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.hero-tags span {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.hero-right {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.hero-stat {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 20px;
+  text-align: center;
+  transition: var(--transition);
+}
+.hero-stat:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.hero-stat .num {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+.hero-stat .label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+.hero-stat.subtle .num { color: var(--text-secondary); }
+.hero-stat.green .num { color: var(--green); }
 
-  /* === TABS === */
-  .tabs {
-    display: flex;
-    gap: 4px;
-    flex-wrap: wrap;
-    margin-bottom: 16px;
-  }
-  .tab-btn {
-    padding: 8px 16px;
-    border: 1px solid #F0D5C5;
-    border-radius: 10px 10px 0 0;
-    background: #FFF8F2;
-    color: #8B5E3C;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .tab-btn:hover { background: #FAD7A1; }
-  .tab-btn.active {
-    background: #D35400;
-    color: #fff;
-    border-color: #D35400;
-  }
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
+/* ── SECTIONS ── */
+section { padding: 64px 32px; }
+section.alt { background: var(--surface); border-top: 1px solid var(--border); }
+.section-inner { max-width: 1200px; margin: 0 auto; }
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+}
+.section-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  margin-bottom: 32px;
+}
+.section-title em { font-style: normal; color: var(--accent); }
 
-  /* === CARD === */
-  .card {
-    background: #FFF8F2;
-    border-radius: 12px;
-    border: 1px solid #F0D5C5;
-    padding: 20px 24px;
-    margin-bottom: 12px;
-    box-shadow: 0 1px 4px rgba(123,63,0,0.06);
-  }
+/* ── ARCH GRID ── */
+.arch-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.arch-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: var(--transition);
+}
+.arch-card:hover { box-shadow: var(--shadow-md); }
+.arch-card.full { grid-column: 1 / -1; }
+.arch-card h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.arch-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.arch-node {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+.arch-node.input { background: var(--blue-light); color: var(--blue); }
+.arch-node.process { background: var(--accent-light); color: var(--accent); }
+.arch-node.store { background: var(--green-light); color: var(--green); }
+.arch-node.output { background: var(--red-light); color: var(--red); }
+.arch-arrow { color: var(--text-tertiary); font-size: 14px; }
 
-  /* === TABLE === */
-  .comp-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-  .comp-table th {
-    background: #FAD7A1;
-    color: #7B3F00;
-    padding: 8px 10px;
-    text-align: left;
-    border-radius: 6px 6px 0 0;
-    font-weight: 600;
-  }
-  .comp-table td {
-    padding: 7px 10px;
-    border-bottom: 1px solid #F5E6D8;
-  }
-  .comp-table tr:last-child td { border-bottom: none; }
-  .comp-table tr:hover td { background: rgba(211,84,0,0.04); }
-  .comp-table .yes { color: #27AE60; font-weight: 700; }
-  .comp-table .no { color: #999; }
-  .comp-table .unique { color: #D35400; font-weight: 700; }
+/* ── FEATURES GRID ── */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: var(--transition);
+  cursor: default;
+}
+.feature-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.feature-card .icon {
+  font-size: 24px;
+  margin-bottom: 12px;
+  display: block;
+}
+.feature-card h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.feature-card p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.feature-card .tag-row {
+  display: flex; gap: 4px; flex-wrap: wrap; margin-top: 12px;
+}
+.feature-card .tag {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text-secondary);
+}
 
-  /* === FLOW DIAGRAM === */
-  .flow-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 20px;
-    background: #FFF;
-    border-radius: 12px;
-    border: 1px solid #F0D5C5;
-  }
-  .flow-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .flow-box {
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    text-align: center;
-    min-width: 120px;
-    transition: transform 0.15s;
-  }
-  .flow-box:hover { transform: scale(1.05); }
-  .flow-input { background: #D4E6F1; color: #1A5276; border: 1px solid #AED6F1; }
-  .flow-process { background: #FAD7A1; color: #7B3F00; border: 1px solid #F0D5C5; }
-  .flow-search { background: #D5F5E3; color: #1E8449; border: 1px solid #ABEBC8; }
-  .flow-output { background: #FADBD8; color: #C0392B; border: 1px solid #F5B7B1; }
-  .flow-arrow {
-    color: #D68910;
-    font-size: 18px;
-    font-weight: 700;
-  }
+/* ── TABLE ── */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+thead th {
+  background: var(--bg);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--text-secondary);
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text);
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--surface-hover); }
+tbody td:first-child { font-weight: 500; }
+.yes { color: var(--green); font-weight: 600; }
+.no { color: var(--text-tertiary); }
+.win { color: var(--accent); font-weight: 600; }
 
-  /* === SCORE BAR === */
-  .score-bar-container {
-    margin: 6px 0;
-  }
-  .score-bar-label {
-    display: flex;
-    justify-content: space-between;
-    font-size: 13px;
-    color: #5D4037;
-    margin-bottom: 4px;
-  }
-  .score-bar-bg {
-    height: 10px;
-    background: #F0D5C5;
-    border-radius: 6px;
-    overflow: hidden;
-  }
-  .score-bar-fill {
-    height: 100%;
-    border-radius: 6px;
-    transition: width 0.8s ease;
-  }
+/* ── METRIC BARS ── */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.metric-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+}
+.metric-card .value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+.metric-card .value.green { color: var(--green); }
+.metric-card .label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 6px;
+}
+.metric-card .sub {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
 
-  /* === FILE LIST === */
-  .file-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    margin: 4px 0;
-    font-size: 13px;
-    transition: background 0.1s;
-  }
-  .file-item:hover { background: rgba(211,84,0,0.05); }
-  .file-icon {
-    font-size: 18px;
-    width: 24px;
-    text-align: center;
-  }
-  .file-name {
-    font-weight: 600;
-    color: #7B3F00;
-    min-width: 160px;
-  }
-  .file-desc {
-    color: #8B5E3C;
-    font-size: 12px;
-  }
-  .file-lines {
-    margin-left: auto;
-    color: #A67B5B;
-    font-size: 11px;
-  }
-  .file-tag {
-    font-size: 10px;
-    padding: 1px 6px;
-    border-radius: 8px;
-    margin-left: 4px;
-  }
-  .tag-new { background: #D5F5E3; color: #1E8449; }
-  .tag-updated { background: #D4E6F1; color: #1A5276; }
-  .tag-original { background: #EAECEE; color: #5D6D7E; }
+.bar-group { margin-top: 16px; }
+.bar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.bar-item .bar-label {
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 100px;
+  color: var(--text);
+}
+.bar-item .bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.bar-item .bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--accent);
+  transition: width .8s ease;
+}
+.bar-item .bar-val {
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 40px;
+  text-align: right;
+  color: var(--text-secondary);
+}
 
-  /* === TIMELINE === */
-  .timeline-item {
-    display: flex;
-    gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid #F5E6D8;
-  }
-  .timeline-item:last-child { border-bottom: none; }
-  .timeline-date {
-    min-width: 100px;
-    font-size: 12px;
-    color: #D35400;
-    font-weight: 600;
-  }
-  .timeline-content {
-    font-size: 13px;
-    color: #5D4037;
-  }
-  .timeline-content strong { color: #7B3F00; }
+/* ── TIMELINE ── */
+.timeline {
+  position: relative;
+  padding-left: 24px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--border);
+}
+.tl-item {
+  position: relative;
+  padding: 0 0 24px 24px;
+}
+.tl-item:last-child { padding-bottom: 0; }
+.tl-item::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--surface);
+}
+.tl-item .date {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.tl-item h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 2px 0 4px;
+}
+.tl-item p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.tl-item .detail {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+}
 
-  /* === CODE === */
-  .code-block {
-    background: #2D3436;
-    color: #DFE6E9;
-    padding: 14px 18px;
-    border-radius: 8px;
-    font-family: 'Consolas', 'Monaco', monospace;
-    font-size: 12px;
-    overflow-x: auto;
-    margin: 8px 0;
-  }
-  .code-block .kw { color: #74B9FF; }
-  .code-block .str { color: #55EFC4; }
-  .code-block .cmt { color: #636E72; }
+/* ── SCORE RANKING ── */
+.rank-list { display: flex; flex-direction: column; gap: 8px; }
+.rank-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+.rank-item:hover { box-shadow: var(--shadow-md); }
+.rank-item .pos {
+  font-size: 18px;
+  width: 28px;
+  text-align: center;
+}
+.rank-item .name {
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 120px;
+}
+.rank-item .score {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+.rank-item .score strong { color: var(--text); font-weight: 700; }
+.rank-item .bar-track {
+  flex: 1;
+  height: 6px;
+  background: var(--bg);
+  border-radius: 3px;
+  overflow: hidden;
+  max-width: 200px;
+}
+.rank-item .bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .8s ease;
+}
+.rank-item.winner {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
 
-  /* === COLLAPSIBLE === */
-  .collapsible {
-    cursor: pointer;
-    user-select: none;
-    padding: 10px 14px;
-    background: #FAD7A1;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #7B3F00;
-    margin: 8px 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: background 0.15s;
-  }
-  .collapsible:hover { background: #F5CBA7; }
-  .collapsible .arrow {
-    transition: transform 0.2s;
-    font-size: 11px;
-  }
-  .collapsible.collapsed .arrow { transform: rotate(-90deg); }
-  .collapsible.collapsed + .collapse-content { display: none; }
+/* ── FILES LIST ── */
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.file-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  transition: var(--transition);
+}
+.file-row:hover { background: var(--surface-hover); }
+.file-row .icon { font-size: 14px; width: 18px; text-align: center; }
+.file-row .fn { font-weight: 500; color: var(--text); min-width: 140px; }
+.file-row .desc { color: var(--text-secondary); font-size: 12px; }
+.file-row .lines { margin-left: auto; color: var(--text-tertiary); font-size: 11px; }
+.file-tag {
+  font-size: 10px; padding: 1px 6px; border-radius: 6px; font-weight: 500; margin-left: 4px;
+}
+.file-tag.new { background: var(--green-light); color: var(--green); }
+.file-tag.upd { background: var(--blue-light); color: var(--blue); }
+.file-tag.org { background: var(--bg); color: var(--text-tertiary); }
 
-  /* === FOOTER === */
-  .footer {
-    text-align: center;
-    padding: 24px;
-    color: #A67B5B;
-    font-size: 12px;
-    border-top: 1px solid #F0D5C5;
-    background: #FFF8F2;
-  }
+/* ── CODE ── */
+.code-block {
+  background: #1A1A1A;
+  color: #E1DEDB;
+  padding: 20px 24px;
+  border-radius: var(--radius);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-x: auto;
+  margin: 16px 0 0;
+}
+.code-block .k { color: #BB9AF7; }
+.code-block .s { color: #9ECE6A; }
+.code-block .c { color: #565248; font-style: italic; }
+.code-block .v { color: #7AA2F7; }
 
-  /* === ANIMATIONS === */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .card, .stat-item, .flow-box { animation: fadeIn 0.3s ease both; }
+/* ── CODE GRID ── */
+.code-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
 
-  /* === RESPONSIVE === */
-  @media (max-width: 768px) {
-    .hero { padding: 32px 20px 28px; }
-    .hero h1 { font-size: 24px; }
-    .content { padding: 20px 16px; }
-    .stats { flex-direction: column; padding: 16px 20px; }
-    .comp-table { font-size: 11px; }
-    .flow-row { flex-direction: column; }
-  }
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; padding: 48px 20px 32px; gap: 32px; }
+  .hero-left h1 { font-size: 30px; }
+  .hero-right { grid-template-columns: repeat(4, 1fr); }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .metrics { grid-template-columns: repeat(2, 1fr); }
+  .file-grid { grid-template-columns: 1fr; }
+  .code-grid { grid-template-columns: 1fr; }
+  .arch-grid { grid-template-columns: 1fr; }
+  section { padding: 48px 20px; }
+  nav { padding: 0 16px; overflow-x: auto; gap: 4px; }
+  nav a { font-size: 12px; padding: 6px 10px; white-space: nowrap; }
+}
+@media (max-width: 600px) {
+  .hero-right { grid-template-columns: repeat(2, 1fr); }
+  .features-grid { grid-template-columns: 1fr; }
+  .metrics { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
 
-<!-- ===== HERO ===== -->
+<!-- ─── NAV ─── -->
+<nav>
+  <span class="logo">✦ LLM Wiki</span>
+  <a href="#arch" class="active">Architecture</a>
+  <a href="#features">Features</a>
+  <a href="#bench">Benchmark</a>
+  <a href="#compare">Comparison</a>
+  <a href="#code">Code</a>
+  <a href="#timeline">Timeline</a>
+</nav>
+
+<!-- ─── HERO ─── -->
 <div class="hero">
-  <h1>🧠 LLM <span>Wiki</span> — Upgraded</h1>
-  <div class="subtitle">
-    Karpathy-style markdown wiki → Production-grade agent memory
+  <div class="hero-left">
+    <h1>LLM <span>Wiki</span> v3.0</h1>
+    <p>A Karpathy-style markdown wiki, upgraded into a production-grade agent memory system with multi-signal fusion, cross-encoder reranking, typed knowledge graphs, auto-reasoning, and synthesis — all local, all zero-cost.</p>
+    <div class="hero-tags">
+      <span>Python</span>
+      <span>3,800+ LOC</span>
+      <span>16 scripts</span>
+      <span>$0 API cost</span>
+      <span>88.9% R@5</span>
+      <span>Windows native</span>
+    </div>
   </div>
-  <div class="version-badge">v3.0 — June 2026</div>
+  <div class="hero-right">
+    <div class="hero-stat"><div class="num">16</div><div class="label">Python scripts</div></div>
+    <div class="hero-stat green"><div class="num">$0</div><div class="label">Monthly API cost</div></div>
+    <div class="hero-stat"><div class="num">38</div><div class="label">Wiki pages</div></div>
+    <div class="hero-stat"><div class="num">3.8K</div><div class="label">Lines of code</div></div>
+    <div class="hero-stat green"><div class="num">88.9%</div><div class="label">Recall@5</div></div>
+    <div class="hero-stat"><div class="num">10</div><div class="label">Profiles</div></div>
+    <div class="hero-stat subtle"><div class="num">0</div><div class="label">Docker containers</div></div>
+    <div class="hero-stat green"><div class="num">15</div><div class="label">Typed edge types</div></div>
+  </div>
 </div>
 
-<!-- ===== STATS ===== -->
-<div class="stats">
-  <div class="stat-item"><strong>16</strong><span>Python scripts</span></div>
-  <div class="stat-item"><strong>3,800+</strong><span>Lines of code</span></div>
-  <div class="stat-item"><strong>38</strong><span>Wiki pages</span></div>
-  <div class="stat-item"><strong>10</strong><span>Profiles</span></div>
-  <div class="stat-item"><strong>88.9%</strong><span>Recall@5</span></div>
-  <div class="stat-item"><strong>$0</strong><span>API cost</span></div>
+<!-- ─── ARCHITECTURE ─── -->
+<section id="arch">
+<div class="section-inner">
+  <div class="section-label">Architecture</div>
+  <h2 class="section-title">How <em>retrieval</em> works</h2>
+
+  <div class="arch-grid">
+
+    <div class="arch-card full">
+      <h3>🔀 Fusion Search Pipeline</h3>
+      <div class="arch-flow">
+        <span class="arch-node input">User Query</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node process">4-Signal Retrieval</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node store">RRF Fusion (k=60)</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node process">Cross-Encoder Rerank</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node process">Recency Weighting</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node output">Synthesis + Gap Analysis</span>
+      </div>
+      <div class="arch-flow" style="margin-top:12px;padding-left:12px;">
+        <span class="arch-node store">🧠 Vector — ChromaDB / BGE-small</span>
+        <span class="arch-node store">🔤 Keyword — SQLite FTS5 / BM25</span>
+        <span class="arch-node store">🏷️ Entity — KG SQLite lookup</span>
+        <span class="arch-node store">🔗 Graph — KG paths + connections</span>
+      </div>
+    </div>
+
+    <div class="arch-card">
+      <h3>🔄 Auto-Reasoning</h3>
+      <div class="arch-flow">
+        <span class="arch-node input">Chat Sessions</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node process">Cron 12h</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node store">LLM Extract</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node process">Contradiction Check</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node output">concepts/ page</span>
+      </div>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:8px;">Extracts: preferences, decisions, facts, deductions, trends. Flags contradictions with past observations.</p>
+    </div>
+
+    <div class="arch-card">
+      <h3>📡 Signal Detector</h3>
+      <div class="arch-flow">
+        <span class="arch-node input">In-session message</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node process">detect_signals()</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node output">signals/{profile}.md</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node store">KG typed edge</span>
+      </div>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:8px;">Real-time capture. No cron wait. One LLM call per detection. Typed edges created immediately.</p>
+    </div>
+
+  </div>
 </div>
+</section>
 
-<!-- ===== CONTENT ===== -->
-<div class="content">
+<!-- ─── FEATURES ─── -->
+<section class="alt" id="features">
+<div class="section-inner">
+  <div class="section-label">Capabilities</div>
+  <h2 class="section-title">All <em>upgrades</em> at a glance</h2>
 
-  <!-- ===== TABS ===== -->
-  <div class="tabs">
-    <button class="tab-btn active" onclick="showTab('arch')">🏗️ Architecture</button>
-    <button class="tab-btn" onclick="showTab('features')">⚡ Features</button>
-    <button class="tab-btn" onclick="showTab('benchmark')">📊 Benchmark</button>
-    <button class="tab-btn" onclick="showTab('compare')">⚖️ vs Others</button>
-    <button class="tab-btn" onclick="showTab('timeline')">📅 Timeline</button>
-    <button class="tab-btn" onclick="showTab('code')">💻 Code</button>
+  <div class="features-grid">
+    <div class="feature-card">
+      <span class="icon">🧠</span>
+      <h4>Multi-Signal Fusion</h4>
+      <p>Vector + BM25 + Entity + Graph — four signals merged via RRF. Cross-encoder reranks with local ONNX. Recency weights decay older pages.</p>
+      <div class="tag-row"><span class="tag">ChromaDB</span><span class="tag">FTS5</span><span class="tag">CE reranker</span></div>
+    </div>
+    <div class="feature-card">
+      <span class="icon">📝</span>
+      <h4>Auto-Extract Save</h4>
+      <p>One call to save_page() generates frontmatter, auto-detects page type, extracts entities, creates typed edges, updates FTS5 + KG + log + index.</p>
+      <div class="tag-row"><span class="tag">10 schema types</span><span class="tag">auto-detect</span></div>
+    </div>
+    <div class="feature-card">
+      <span class="icon">🔗</span>
+      <h4>Typed Graph Edges</h4>
+      <p>15 edge types: trades, prefers, uses, works_at, founded, advises, rejected, improved, confirmed, owns, learns, and more. Meaningful relationships.</p>
+      <div class="tag-row"><span class="tag">SQLite KG</span><span class="tag">profile_summary()</span></div>
+    </div>
+    <div class="feature-card">
+      <span class="icon">🤖</span>
+      <h4>Auto-Reasoning</h4>
+      <p>Cron scans 10 profiles every 12h. Extracts observations, deductions, and trends. Detects contradictions with past. Saves as searchable concept pages.</p>
+      <div class="tag-row"><span class="tag">DeepSeek</span><span class="tag">trend detection</span></div>
+    </div>
+    <div class="feature-card">
+      <span class="icon">📄</span>
+      <h4>Synthesis + Gap Analysis</h4>
+      <p>Fusion search → structured answer with Summary ✅ Knows ⚠️ Doesn't Know sections. Pre-computes expected topics, compares with sources, reports missing information.</p>
+      <div class="tag-row"><span class="tag">LLM synthesis</span><span class="tag">gap detection</span></div>
+    </div>
+    <div class="feature-card">
+      <span class="icon">📡</span>
+      <h4>Signal Detector</h4>
+      <p>Real-time capture during conversations. Detects preferences, decisions, facts, todos, corrections. Creates typed edges instantly. No cron delay.</p>
+      <div class="tag-row"><span class="tag">in-session</span><span class="tag">_wikisignal.py</span></div>
+    </div>
+    <div class="feature-card">
+      <span class="icon">📊</span>
+      <h4>Benchmark Suite</h4>
+      <p>Recall@1, Recall@3, Recall@5, MRR. Auto-discovers queries from wiki pages. Reports per-query hits/misses. Compare against Mem0, GBrain, Honcho.</p>
+      <div class="tag-row"><span class="tag">88.9% R@5</span><span class="tag">_benchmark.py</span></div>
+    </div>
+    <div class="feature-card">
+      <span class="icon">🏗️</span>
+      <h4>Schema Packs</h4>
+      <p>10 page type definitions with custom fields and edge types. YAML-based, easy to extend. Auto-detects type from tags, content, and profile.</p>
+      <div class="tag-row"><span class="tag">10 types</span><span class="tag">_schema.yaml</span></div>
+    </div>
+    <div class="feature-card">
+      <span class="icon">🎯</span>
+      <h4>BGE-small Embedding</h4>
+      <p>Upgraded from ONNX MiniLM (2019, English-only) to BGE-small-en-v1.5 (2024, multilingual-friendly). Better accuracy with negligible size increase.</p>
+      <div class="tag-row"><span class="tag">33MB</span><span class="tag">multilingual</span></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── BENCHMARK ─── -->
+<section id="bench">
+<div class="section-inner">
+  <div class="section-label">Performance</div>
+  <h2 class="section-title">Benchmark <em>results</em></h2>
+
+  <div class="metrics">
+    <div class="metric-card">
+      <div class="value green">77.8%</div>
+      <div class="label">Recall@1</div>
+      <div class="sub">7 / 9 queries</div>
+    </div>
+    <div class="metric-card">
+      <div class="value green">88.9%</div>
+      <div class="label">Recall@3</div>
+      <div class="sub">8 / 9 queries</div>
+    </div>
+    <div class="metric-card">
+      <div class="value green">88.9%</div>
+      <div class="label">Recall@5</div>
+      <div class="sub">8 / 9 queries</div>
+    </div>
+    <div class="metric-card">
+      <div class="value">0.833</div>
+      <div class="label">MRR</div>
+      <div class="sub">Mean Reciprocal Rank</div>
+    </div>
   </div>
 
-  <!-- ===== TAB: ARCHITECTURE ===== -->
-  <div id="tab-arch" class="tab-content active">
-
-    <div class="section-title">📡 Retrieval Pipeline</div>
-    <div class="card">
-      <div class="flow-container">
-        <div class="flow-row">
-          <div class="flow-box flow-input">📝 User Query</div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-box flow-process">🔀 4-Signal Retrieval</div>
-        </div>
-        <div class="flow-row" style="padding-left: 40px;">
-          <div class="flow-box flow-search">🧠 ChromaDB<br><small>BGE-small vector</small></div>
-          <div class="flow-box flow-search">🔤 FTS5<br><small>BM25 keyword</small></div>
-          <div class="flow-box flow-search">🏷️ KG Entity<br><small>SQLite lookup</small></div>
-          <div class="flow-box flow-search">🔗 KG Graph<br><small>Path + connections</small></div>
-        </div>
-        <div class="flow-row">
-          <div class="flow-arrow">↓</div>
-        </div>
-        <div class="flow-row">
-          <div class="flow-box flow-process">📊 RRF Fusion<br><small>k=60 merge</small></div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-box flow-process">🎯 Cross-Encoder<br><small>ms-marco rerank</small></div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-box flow-process">⏳ Recency Weight<br><small>7/30/60/90d decay</small></div>
-        </div>
-        <div class="flow-row">
-          <div class="flow-arrow">↓</div>
-        </div>
-        <div class="flow-row">
-          <div class="flow-box flow-output">📄 Synthesis + Gap Analysis<br><small>Answer with citations</small></div>
-        </div>
-      </div>
+  <div class="bar-group" style="margin-top:24px;">
+    <div class="bar-item">
+      <span class="bar-label">LLM Wiki (Kau)</span>
+      <div class="bar-track"><div class="bar-fill" style="width:88.9%;background:var(--accent);"></div></div>
+      <span class="bar-val">88.9%</span>
     </div>
-
-    <div class="section-title">🔄 Auto-Reasoning Pipeline</div>
-    <div class="card">
-      <div class="flow-container">
-        <div class="flow-row">
-          <div class="flow-box flow-input">💬 Chat Sessions<br><small>10 profiles</small></div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-box flow-process">⏰ Cron 12h<br><small>_reason.py</small></div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-box flow-process">🤖 LLM Extract<br><small>Deductions + Trends</small></div>
-        </div>
-        <div class="flow-row">
-          <div class="flow-arrow">↓</div>
-        </div>
-        <div class="flow-row">
-          <div class="flow-box flow-process">⚠️ Contradiction Check<br><small>New vs Past</small></div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-box flow-search">📝 Save to Wiki<br><small>concepts/ page</small></div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-box flow-output">📊 KG + FTS5 + Log<br><small>Auto-indexed</small></div>
-        </div>
-      </div>
+    <div class="bar-item">
+      <span class="bar-label">GBrain</span>
+      <div class="bar-track"><div class="bar-fill" style="width:97.9%;background:var(--green);"></div></div>
+      <span class="bar-val">97.9%</span>
     </div>
-
-    <div class="section-title">📁 File Structure</div>
-    <div class="card">
-
-      <div class="collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span> 📂 Core Scripts (16 files)
-      </div>
-      <div class="collapse-content">
-
-        <div class="file-item">
-          <span class="file-icon">🐍</span>
-          <span class="file-name">_search.py</span>
-          <span class="file-desc">Vector search — ChromaDB + BGE-small</span>
-          <span class="file-tag tag-updated">updated</span>
-          <span class="file-lines">270 lines</span>
-        </div>
-        <div class="file-item">
-          <span class="file-icon">🐍</span>
-          <span class="file-name">_kg.py</span>
-          <span class="file-desc">Knowledge graph + typed edges (15 types)</span>
-          <span class="file-tag tag-updated">updated</span>
-          <span class="file-lines">700 lines</span>
-        </div>
-        <div class="file-item">
-          <span class="file-icon">🐍</span>
-          <span class="file-name">_fusion.py</span>
-          <span class="file-desc">4-signal fusion + CE reranker + recency</span>
-          <span class="file-tag tag-new">new</span>
-          <span class="file-lines">491 lines</span>
-        </div>
-        <div class="file-item">
-          <span class="file-icon">🐍</span>
-          <span class="file-name">_save.py</span>
-          <span class="file-desc">Auto-extract save + schema packs</span>
-          <span class="file-tag tag-new">new</span>
-          <span class="file-lines">421 lines</span>
-        </div>
-        <div class="file-item">
-          <span class="file-icon">🐍</span>
-          <span class="file-name">_reason.py</span>
-          <span class="file-desc">Auto-reasoning + contradictions + trends</span>
-          <span class="file-tag tag-new">new</span>
-          <span class="file-lines">466 lines</span>
-        </div>
-        <div class="file-item">
-          <span class="file-icon">🐍</span>
-          <span class="file-name">_synthesize.py</span>
-          <span class="file-desc">Synthesis + gap analysis + structured output</span>
-          <span class="file-tag tag-new">new</span>
-          <span class="file-lines">237 lines</span>
-        </div>
-        <div class="file-item">
-          <span class="file-icon">🐍</span>
-          <span class="file-name">_wikisignal.py</span>
-          <span class="file-desc">Real-time signal detector</span>
-          <span class="file-tag tag-new">new</span>
-          <span class="file-lines">200 lines</span>
-        </div>
-        <div class="file-item">
-          <span class="file-icon">🐍</span>
-          <span class="file-name">_benchmark.py</span>
-          <span class="file-desc">Retrieval evaluation — R@1/3/5 + MRR</span>
-          <span class="file-tag tag-new">new</span>
-          <span class="file-lines">212 lines</span>
-        </div>
-        <div class="file-item">
-          <span class="file-icon">🐍</span>
-          <span class="file-name">_health.py</span>
-          <span class="file-desc">Health checks + stale page detection</span>
-          <span class="file-tag tag-original">original</span>
-          <span class="file-lines">355 lines</span>
-        </div>
-        <div class="file-item">
-          <span class="file-icon">🐍</span>
-          <span class="file-name">_autobacklink.py</span>
-          <span class="file-desc">Auto-backlink detection</span>
-          <span class="file-tag tag-original">original</span>
-          <span class="file-lines">159 lines</span>
-        </div>
-        <div class="file-item">
-          <span class="file-icon">🐍</span>
-          <span class="file-name">_update_index.py</span>
-          <span class="file-desc">Auto-build index.md</span>
-          <span class="file-tag tag-original">original</span>
-          <span class="file-lines">185 lines</span>
-        </div>
-        <div class="file-item">
-          <span class="file-icon">🐍</span>
-          <span class="file-name">_reindex.py</span>
-          <span class="file-desc">Rebuild all indexes</span>
-          <span class="file-tag tag-updated">updated</span>
-          <span class="file-lines">36 lines</span>
-        </div>
-        <div class="file-item">
-          <span class="file-icon">📄</span>
-          <span class="file-name">_schema.yaml</span>
-          <span class="file-desc">Page type definitions (10 types)</span>
-          <span class="file-tag tag-new">new</span>
-          <span class="file-lines">120 lines</span>
-        </div>
-
-      </div>
+    <div class="bar-item">
+      <span class="bar-label">Honcho</span>
+      <div class="bar-track"><div class="bar-fill" style="width:90.4%;background:var(--blue);"></div></div>
+      <span class="bar-val">90.4%</span>
     </div>
-
+    <div class="bar-item">
+      <span class="bar-label">Mem0</span>
+      <div class="bar-track"><div class="bar-fill" style="width:94.8%;background:var(--green);"></div></div>
+      <span class="bar-val">94.8%</span>
+    </div>
   </div>
+  <p style="font-size:12px;color:var(--text-tertiary);margin-top:12px;">⚠️ LLM Wiki score from 9 natural-language queries vs wiki pages. Other scores from published benchmarks on 240+ page corpora. Not directly comparable — directional reference only.</p>
+</div>
+</section>
 
-  <!-- ===== TAB: FEATURES ===== -->
-  <div id="tab-features" class="tab-content">
+<!-- ─── COMPARISON ─── -->
+<section class="alt" id="compare">
+<div class="section-inner">
+  <div class="section-label">Comparison</div>
+  <h2 class="section-title">LLM Wiki vs <em>the field</em></h2>
 
-    <div class="section-title">⚡ Feature List <span class="badge">All upgrades</span></div>
-
-    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
-      <span class="arrow">▼</span> 🔀 Multi-Signal Fusion Search
-    </div>
-    <div class="collapse-content">
-      <div class="card">
-        <table class="comp-table">
-          <tr><th>Signal</th><th>Source</th><th>What it does</th></tr>
-          <tr><td>🧠 Vector</td><td>ChromaDB + BGE-small</td><td>Semantic — cari ikut maksud</td></tr>
-          <tr><td>🔤 Keyword</td><td>FTS5 (SQLite)</td><td>BM25 — cari kata tepat</td></tr>
-          <tr><td>🏷️ Entity</td><td>KG SQLite</td><td>Cari nama entity + related pages</td></tr>
-          <tr><td>🔗 Graph</td><td>KG SQLite</td><td>Path finding + connections</td></tr>
-          <tr><td>📊 RRF</td><td>Reciprocal Rank Fusion</td><td>Merge 4 signals — k=60</td></tr>
-          <tr><td>🎯 CE Reranker</td><td>ms-marco-MiniLM-L-6-v2</td><td>Local ONNX — zero API cost</td></tr>
-          <tr><td>⏳ Recency</td><td>KG page_metadata</td><td>7d=1.0 → 90d=0.3 weight</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
-      <span class="arrow">▼</span> 📝 Auto-Save with Schema Packs
-    </div>
-    <div class="collapse-content">
-      <div class="card">
-        <p style="font-size:13px;color:#5D4037;margin-bottom:10px;">
-          <code>save_page()</code> auto-detects page type, extracts entities, creates typed edges, updates FTS5 + KG + log + index.
-        </p>
-        <table class="comp-table">
-          <tr><th>Schema Type</th><th>Icon</th><th>Profile</th><th>Edges</th></tr>
-          <tr><td>investment-strategy</td><td>📈</td><td>Robin</td><td>trades, prefers, uses</td></tr>
-          <tr><td>coding-pattern</td><td>💻</td><td>Zorro</td><td>prefers, uses</td></tr>
-          <tr><td>health-plan</td><td>🩺</td><td>Chopper</td><td>learns, uses</td></tr>
-          <tr><td>site-record</td><td>🏗️</td><td>Jinbei</td><td>owns</td></tr>
-          <tr><td>person</td><td>👤</td><td>—</td><td>works_at, advises</td></tr>
-          <tr><td>meeting</td><td>📅</td><td>—</td><td>attended</td></tr>
-          <tr><td>comparison</td><td>⚖️</td><td>—</td><td>related</td></tr>
-          <tr><td>project</td><td>🚀</td><td>Franky</td><td>founded, uses</td></tr>
-          <tr><td>observation</td><td>🔍</td><td>—</td><td>confirmed, rejected</td></tr>
-          <tr><td>general</td><td>📄</td><td>—</td><td>mentions</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
-      <span class="arrow">▼</span> 🔗 Typed Graph Edges (15 types)
-    </div>
-    <div class="collapse-content">
-      <div class="card">
-        <table class="comp-table">
-          <tr><th>Edge</th><th>Icon</th><th>Meaning</th><th>Example</th></tr>
-          <tr><td>trades</td><td>🔁</td><td>Profile trades X</td><td>robin → trades → EURUSD</td></tr>
-          <tr><td>prefers</td><td>👍</td><td>Profile prefers X</td><td>zorro → prefers → async</td></tr>
-          <tr><td>uses</td><td>🔧</td><td>Profile uses tool X</td><td>nami → uses → TradingView</td></tr>
-          <tr><td>works_at</td><td>🏢</td><td>Works at company</td><td>person → works_at → Acme</td></tr>
-          <tr><td>founded</td><td>🚀</td><td>Founded company</td><td>franky → founded → project</td></tr>
-          <tr><td>advises</td><td>💡</td><td>Advises project</td><td>person → advises → startup</td></tr>
-          <tr><td>rejected</td><td>❌</td><td>Rejected approach</td><td>luffy → rejected → Docker</td></tr>
-          <tr><td>improved</td><td>⬆️</td><td>Improved X</td><td>wiki → improved → reranker</td></tr>
-          <tr><td>confirmed</td><td>✅</td><td>Confirmed preference</td><td>robin → confirmed → scalping</td></tr>
-          <tr><td>owns</td><td>📦</td><td>Owns asset</td><td>jinbei → owns → materials</td></tr>
-          <tr><td>learns</td><td>📚</td><td>Learning X</td><td>chopper → learns → nutrition</td></tr>
-          <tr><td>mentions</td><td>📄</td><td>Generic mention</td><td>page → mentions → entity</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
-      <span class="arrow">▼</span> 🤖 Auto-Reasoning + Contradiction Detection
-    </div>
-    <div class="collapse-content">
-      <div class="card">
-        <p style="font-size:13px;color:#5D4037;">
-          Cron setiap 12 jam — scan 10 profile sessions, extract observations + deductions + trends, detect contradictions dengan observation lepas.
-        </p>
-        <div class="code-block" style="margin-top:10px;">
-<span class="cmt"># Observation types extracted:</span>
-<span class="kw">JOB 1</span>: preference, fact, strategy, decision, correction
-<span class="kw">JOB 2</span>: <span class="str">deduction</span> — logical conclusions (MOST IMPORTANT)
-<span class="kw">JOB 3</span>: <span class="str">trend</span> — compare with past (changed/improved/evolved)
-<span class="kw">CONTRA</span>: flag if new contradicts old → <span class="str">"⚠️ FLAG"</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
-      <span class="arrow">▼</span> 📡 Signal Detector (Real-time)
-    </div>
-    <div class="collapse-content">
-      <div class="card">
-        <p style="font-size:13px;color:#5D4037;">
-          <code>_wikisignal.py</code> — capture important info dalam sesi, terus simpan + create typed edges. Tak tunggu cron.
-        </p>
-      </div>
-    </div>
-
-    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
-      <span class="arrow">▼</span> 📄 Synthesis + Gap Analysis
-    </div>
-    <div class="collapse-content">
-      <div class="card">
-        <p style="font-size:13px;color:#5D4037;">
-          <code>_synthesize.py</code> — baca fusion results, LLM synthesize jawapan dengan structured sections:
-        </p>
-        <div class="code-block" style="margin-top:10px;">
-📌 <span class="str">Summary</span> — one-line answer
-✅ <span class="str">What wiki KNOWS</span> — with 📍Source[N] citations
-⚠️ <span class="str">What wiki DOESN'T KNOW</span> — pre-computed gaps
-🔍 <span class="str">Confidence</span> — numeric 0.0-1.0
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ===== TAB: BENCHMARK ===== -->
-  <div id="tab-benchmark" class="tab-content">
-
-    <div class="section-title">📊 Benchmark Results <span class="badge">2026-06-27</span></div>
-
-    <div class="card">
-      <div class="score-bar-container">
-        <div class="score-bar-label"><span>Recall@1</span><span>77.8%</span></div>
-        <div class="score-bar-bg"><div class="score-bar-fill" style="width:77.8%;background:#27AE60;"></div></div>
-      </div>
-      <div class="score-bar-container">
-        <div class="score-bar-label"><span>Recall@3</span><span>88.9%</span></div>
-        <div class="score-bar-bg"><div class="score-bar-fill" style="width:88.9%;background:#27AE60;"></div></div>
-      </div>
-      <div class="score-bar-container">
-        <div class="score-bar-label"><span>Recall@5</span><span>88.9%</span></div>
-        <div class="score-bar-bg"><div class="score-bar-fill" style="width:88.9%;background:#27AE60;"></div></div>
-      </div>
-      <div class="score-bar-container">
-        <div class="score-bar-label"><span>MRR</span><span>0.8333</span></div>
-        <div class="score-bar-bg"><div class="score-bar-fill" style="width:83.3%;background:#E67E22;"></div></div>
-      </div>
-    </div>
-
-    <div class="section-title">🏆 Comparison with Industry</div>
-    <div class="card">
-      <table class="comp-table">
-        <tr><th>System</th><th>Benchmark</th><th>Score</th><th>Pages</th></tr>
-        <tr><td><strong>Mem0</strong></td><td>LongMemEval</td><td class="yes">94.8%</td><td>Production</td></tr>
-        <tr><td><strong>GBrain</strong></td><td>BrainBench R@5</td><td class="yes">97.9%</td><td>146,646</td></tr>
-        <tr><td><strong>Honcho</strong></td><td>LoCoMo</td><td class="yes">~90.4%</td><td>Enterprise</td></tr>
-        <tr><td><strong>LLM Wiki (Kau)</strong></td><td>Self-eval R@5</td><td class="unique">88.9%</td><td>38</td></tr>
-      </table>
-      <p style="font-size:12px;color:#8B5E3C;margin-top:8px;">
-        ⚠️ LLM Wiki score dari 9 natural queries — bukan standard benchmark. Still, 88.9% dengan 38 pages vs 146K pages adalah impressively efficient.
-      </p>
-    </div>
-
-  </div>
-
-  <!-- ===== TAB: COMPARE ===== -->
-  <div id="tab-compare" class="tab-content">
-
-    <div class="section-title">⚖️ Detailed Comparison</div>
-    <div class="card" style="overflow-x:auto;">
-      <table class="comp-table">
+  <div class="table-wrap">
+    <table>
+      <thead>
         <tr>
           <th>Feature</th>
-          <th>LLM Wiki</th>
+          <th>LLM Wiki v3.0</th>
           <th>Mem0</th>
           <th>GBrain</th>
           <th>Hindsight</th>
           <th>Honcho</th>
         </tr>
-        <tr>
-          <td>⭐ Stars</td>
-          <td>—</td>
-          <td>58.9K</td>
-          <td>24.2K</td>
-          <td>16.6K</td>
-          <td>5.5K</td>
-        </tr>
-        <tr>
-          <td>Language</td>
-          <td>Python</td>
-          <td>Python</td>
-          <td>TypeScript</td>
-          <td>Python</td>
-          <td>Python</td>
-        </tr>
-        <tr>
-          <td>Docker required</td>
-          <td class="unique">❌ No</td>
-          <td class="no">✅ Yes</td>
-          <td class="no">✅ Yes</td>
-          <td class="no">✅ Yes</td>
-          <td class="no">✅ Yes</td>
-        </tr>
-        <tr>
-          <td>API cost</td>
-          <td class="unique">$0</td>
-          <td class="no">$$</td>
-          <td class="no">$$</td>
-          <td class="no">$$</td>
-          <td class="no">$</td>
-        </tr>
-        <tr>
-          <td>Vector search</td>
-          <td class="yes">✅ BGE-small</td>
-          <td class="yes">✅</td>
-          <td class="yes">✅ pgvector</td>
-          <td class="yes">✅</td>
-          <td class="yes">✅</td>
-        </tr>
-        <tr>
-          <td>Keyword/BM25</td>
-          <td class="yes">✅ FTS5</td>
-          <td class="yes">✅</td>
-          <td class="yes">✅</td>
-          <td class="yes">✅</td>
-          <td class="yes">✅</td>
-        </tr>
-        <tr>
-          <td>Knowledge graph</td>
-          <td class="yes">✅ SQLite</td>
-          <td class="no">❌</td>
-          <td class="yes">✅ Self-wiring</td>
-          <td class="yes">✅</td>
-          <td class="yes">✅</td>
-        </tr>
-        <tr>
-          <td>Fusion search</td>
-          <td class="yes">✅ 4-signal</td>
-          <td class="yes">✅</td>
-          <td class="yes">✅ 6-signal</td>
-          <td class="yes">✅ 4-strat</td>
-          <td class="yes">✅</td>
-        </tr>
-        <tr>
-          <td>Cross-encoder</td>
-          <td class="unique">✅ Local (free)</td>
-          <td class="no">❌</td>
-          <td class="yes">✅ API</td>
-          <td class="yes">✅</td>
-          <td class="no">❌</td>
-        </tr>
-        <tr>
-          <td>Typed edges</td>
-          <td class="yes">✅ 15 types</td>
-          <td class="no">❌</td>
-          <td class="yes">✅ 15+</td>
-          <td class="no">❌</td>
-          <td class="no">❌</td>
-        </tr>
-        <tr>
-          <td>Synthesis layer</td>
-          <td class="yes">✅</td>
-          <td class="no">❌</td>
-          <td class="yes">✅</td>
-          <td class="no">❌</td>
-          <td class="no">❌</td>
-        </tr>
-        <tr>
-          <td>Gap analysis</td>
-          <td class="yes">✅</td>
-          <td class="no">❌</td>
-          <td class="yes">✅</td>
-          <td class="no">❌</td>
-          <td class="no">❌</td>
-        </tr>
-        <tr>
-          <td>Contradiction detection</td>
-          <td class="yes">✅</td>
-          <td class="no">❌</td>
-          <td class="yes">✅</td>
-          <td class="no">❌</td>
-          <td class="no">❌</td>
-        </tr>
-        <tr>
-          <td>Profile isolation</td>
-          <td class="unique">✅ 10 native</td>
-          <td class="yes">✅ user_id</td>
-          <td class="no">❌</td>
-          <td class="yes">✅ banks</td>
-          <td class="yes">✅ peers</td>
-        </tr>
-        <tr>
-          <td>Auto-reasoning</td>
-          <td class="yes">✅ Cron 12h</td>
-          <td class="no">❌</td>
-          <td class="yes">✅ Dream</td>
-          <td class="yes">✅</td>
-          <td class="yes">✅</td>
-        </tr>
-        <tr>
-          <td>Signal detector</td>
-          <td class="yes">✅ Real-time</td>
-          <td class="no">❌</td>
-          <td class="yes">✅</td>
-          <td class="no">❌</td>
-          <td class="no">❌</td>
-        </tr>
-        <tr>
-          <td>Schema packs</td>
-          <td class="yes">✅ 10 types</td>
-          <td class="no">❌</td>
-          <td class="yes">✅ 22 types</td>
-          <td class="no">❌</td>
-          <td class="no">❌</td>
-        </tr>
-        <tr>
-          <td>Git versioning</td>
-          <td class="unique">✅ .md files</td>
-          <td class="no">❌ DB</td>
-          <td class="yes">✅</td>
-          <td class="no">❌ DB</td>
-          <td class="no">❌ DB</td>
-        </tr>
-        <tr>
-          <td>Benchmark</td>
-          <td>88.9% R@5</td>
-          <td class="yes">94.8%</td>
-          <td class="yes">97.9%</td>
-          <td>SOTA</td>
-          <td>90.4%</td>
-        </tr>
-      </table>
-    </div>
-
-    <div class="section-title">🏆 Final Ranking (Weighted for Kevin's setup)</div>
-    <div class="card">
-      <div class="score-bar-container">
-        <div class="score-bar-label"><span>🥇 LLM Wiki (Kau)</span><span>8.5/10</span></div>
-        <div class="score-bar-bg"><div class="score-bar-fill" style="width:85%;background:#27AE60;"></div></div>
-      </div>
-      <div class="score-bar-container">
-        <div class="score-bar-label"><span>🥈 GBrain</span><span>7.3/10</span></div>
-        <div class="score-bar-bg"><div class="score-bar-fill" style="width:73%;background:#E67E22;"></div></div>
-      </div>
-      <div class="score-bar-container">
-        <div class="score-bar-label"><span>🥉 Honcho</span><span>6.8/10</span></div>
-        <div class="score-bar-bg"><div class="score-bar-fill" style="width:68%;background:#F39C12;"></div></div>
-      </div>
-      <div class="score-bar-container">
-        <div class="score-bar-label"><span>Hindsight</span><span>6.6/10</span></div>
-        <div class="score-bar-bg"><div class="score-bar-fill" style="width:66%;background:#E74C3C;"></div></div>
-      </div>
-      <div class="score-bar-container">
-        <div class="score-bar-label"><span>Mem0</span><span>6.3/10</span></div>
-        <div class="score-bar-bg"><div class="score-bar-fill" style="width:63%;background:#95A5A6;"></div></div>
-      </div>
-    </div>
-
+      </thead>
+      <tbody>
+        <tr><td>Docker required</td><td class="win">No</td><td class="no">Yes</td><td class="no">Yes</td><td class="no">Yes</td><td class="no">Yes</td></tr>
+        <tr><td>API cost</td><td class="win">$0</td><td class="no">$$</td><td class="no">$$</td><td class="no">$$$</td><td class="no">$</td></tr>
+        <tr><td>Vector search</td><td class="yes">ChromaDB</td><td class="yes">Qdrant</td><td class="yes">pgvector</td><td class="yes">Internal</td><td class="yes">pgvector</td></tr>
+        <tr><td>Keyword/BM25</td><td class="yes">FTS5</td><td class="yes">BM25</td><td class="yes">BM25</td><td class="yes">BM25</td><td class="yes">BM25</td></tr>
+        <tr><td>Knowledge graph</td><td class="yes">SQLite</td><td class="no">—</td><td class="yes">Self-wiring</td><td class="yes">Entity</td><td class="yes">Implicit</td></tr>
+        <tr><td>Fusion search</td><td class="yes">4-signal RRF</td><td class="yes">Multi</td><td class="yes">6-signal</td><td class="yes">4-strat</td><td class="yes">Hybrid</td></tr>
+        <tr><td>Cross-encoder</td><td class="win">Local ONNX</td><td class="no">—</td><td class="yes">API</td><td class="yes">Yes</td><td class="no">—</td></tr>
+        <tr><td>Typed edges</td><td class="win">15 types</td><td class="no">—</td><td class="yes">15+</td><td class="no">—</td><td class="no">—</td></tr>
+        <tr><td>Synthesis + gaps</td><td class="yes">Yes</td><td class="no">—</td><td class="yes">Yes</td><td class="no">—</td><td class="no">—</td></tr>
+        <tr><td>Contradiction detection</td><td class="yes">Yes</td><td class="no">—</td><td class="yes">Dream</td><td class="no">—</td><td class="no">—</td></tr>
+        <tr><td>Profile isolation</td><td class="win">10 native</td><td class="yes">user_id</td><td class="no">—</td><td class="yes">banks</td><td class="yes">peers</td></tr>
+        <tr><td>Auto-reasoning</td><td class="yes">Cron 12h</td><td class="no">—</td><td class="yes">Dream</td><td class="yes">Reflect</td><td class="yes">Bg</td></tr>
+        <tr><td>Signal detector</td><td class="yes">Real-time</td><td class="no">—</td><td class="yes">Yes</td><td class="no">—</td><td class="no">—</td></tr>
+        <tr><td>Schema packs</td><td class="yes">10 types</td><td class="no">—</td><td class="yes">22 types</td><td class="no">—</td><td class="no">—</td></tr>
+        <tr><td>Git versioning</td><td class="win">.md files</td><td class="no">DB</td><td class="yes">Git repo</td><td class="no">DB</td><td class="no">DB</td></tr>
+        <tr><td>Stars</td><td>—</td><td>58.9K</td><td>24.2K</td><td>16.6K</td><td>5.5K</td></tr>
+        <tr><td>Language</td><td>Python</td><td>Python</td><td>TS</td><td>Python</td><td>Python</td></tr>
+      </tbody>
+    </table>
   </div>
 
-  <!-- ===== TAB: TIMELINE ===== -->
-  <div id="tab-timeline" class="tab-content">
+  <div class="section-label" style="margin-top:40px;">Weighted ranking</div>
+  <h2 class="section-title" style="margin-bottom:20px;">Best fit for <em>Kevin's setup</em></h2>
 
-    <div class="section-title">📅 Upgrade Timeline</div>
-    <div class="card">
-
-      <div class="timeline-item">
-        <div class="timeline-date">June 17</div>
-        <div class="timeline-content">
-          <strong>Phase 1: Foundation</strong> — Karpathy-style markdown wiki<br>
-          <small>_search.py, _kg.py, _reindex.py, _update_index.py, _health.py</small>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">June 17</div>
-        <div class="timeline-content">
-          <strong>Phase 2: FTS5 + Page Metadata</strong><br>
-          <small>page_fts virtual table, page_metadata, search_by_profile/tag/date, stale_pages()</small>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">June 20</div>
-        <div class="timeline-content">
-          <strong>Phase 3: Multi-Signal Fusion Search</strong> 🆕<br>
-          <small>_fusion.py — 4 signals (vector + FTS5 + entity + KG) + RRF merge</small>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">June 20</div>
-        <div class="timeline-content">
-          <strong>Phase 4: Auto-Extract Save</strong> 🆕<br>
-          <small>_save.py — YAML frontmatter, folder routing, FTS5+KG+log+index auto-update</small>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">June 20</div>
-        <div class="timeline-content">
-          <strong>Phase 5: Cross-Encoder Reranker</strong> 🆕<br>
-          <small>ms-marco-MiniLM-L-6-v2 — 88MB local ONNX, zero API cost</small>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">June 25</div>
-        <div class="timeline-content">
-          <strong>Phase 6: Auto-Reasoning Cron</strong> 🆕<br>
-          <small>_reason.py — scan sessions, LLM extract, save as concept page, cron 12h</small>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">June 25-26</div>
-        <div class="timeline-content">
-          <strong>Phase 7: Final Upgrades</strong><br>
-          <small>Auto entity extraction, deductive prompt, KG+Vector fusion, trend detection, recency/forgetting</small>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">June 26</div>
-        <div class="timeline-content">
-          <strong>Phase 8: GBrain-inspired</strong> 🚀<br>
-          <small>Typed graph edges (15 types), synthesis layer (_synthesize.py), gap analysis, better dedup</small>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">June 27</div>
-        <div class="timeline-content">
-          <strong>Phase 9: Signal + Schema + Benchmark</strong> 🆕<br>
-          <small>_wikisignal.py (real-time capture), _schema.yaml (10 page types), _benchmark.py (88.9% R@5)</small>
-        </div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">June 27</div>
-        <div class="timeline-content">
-          <strong>Phase 10: Final Tuning</strong> 🆕<br>
-          <small>BGE-small embedding (multilingual), contradiction detection, structured synthesis</small>
-        </div>
-      </div>
-
+  <div class="rank-list">
+    <div class="rank-item winner">
+      <span class="pos">🥇</span>
+      <span class="name">LLM Wiki v3.0</span>
+      <div class="bar-track"><div class="bar-fill" style="width:85%;background:var(--accent);"></div></div>
+      <span class="score"><strong>8.5</strong> / 10</span>
     </div>
-
+    <div class="rank-item">
+      <span class="pos">🥈</span>
+      <span class="name">GBrain</span>
+      <div class="bar-track"><div class="bar-fill" style="width:73%;background:var(--text-tertiary);"></div></div>
+      <span class="score"><strong>7.3</strong> / 10</span>
+    </div>
+    <div class="rank-item">
+      <span class="pos">🥉</span>
+      <span class="name">Honcho</span>
+      <div class="bar-track"><div class="bar-fill" style="width:68%;background:var(--text-tertiary);"></div></div>
+      <span class="score"><strong>6.8</strong> / 10</span>
+    </div>
+    <div class="rank-item">
+      <span class="pos">4</span>
+      <span class="name">Hindsight</span>
+      <div class="bar-track"><div class="bar-fill" style="width:66%;background:var(--text-tertiary);"></div></div>
+      <span class="score"><strong>6.6</strong> / 10</span>
+    </div>
+    <div class="rank-item">
+      <span class="pos">5</span>
+      <span class="name">Mem0</span>
+      <div class="bar-track"><div class="bar-fill" style="width:63%;background:var(--text-tertiary);"></div></div>
+      <span class="score"><strong>6.3</strong> / 10</span>
+    </div>
   </div>
+  <p style="font-size:12px;color:var(--text-tertiary);margin-top:12px;">Weighted by: zero cost (15%), profile system (10%), simplicity (10%), retrieval (25%), knowledge (15%), auto-learning (15%), synthesis (10%). Different weights = different ranking.</p>
+</div>
+</section>
 
-  <!-- ===== TAB: CODE ===== -->
-  <div id="tab-code" class="tab-content">
+<!-- ─── CODE ─── -->
+<section id="code">
+<div class="section-inner">
+  <div class="section-label">Usage</div>
+  <h2 class="section-title">Code <em>samples</em></h2>
 
-    <div class="section-title">💻 Usage Examples</div>
-
-    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
-      <span class="arrow">▼</span> 🔀 Fusion Search
-    </div>
-    <div class="collapse-content">
+  <div class="code-grid">
+    <div>
+      <div class="section-label" style="margin-bottom:4px;">Fusion Search</div>
       <div class="code-block">
-<span class="kw">import</span> sys
-sys.path.insert(<span class="str">0</span>, <span class="str">"C:/Users/kevin/wiki"</span>)
-<span class="kw">from</span> _fusion <span class="kw">import</span> fusion_search
+<span class="c"># Multi-signal retrieval</span>
+<span class="k">from</span> _fusion <span class="k">import</span> fusion_search
 
-<span class="cmt"># Search — auto rerank with cross-encoder</span>
-results = fusion_search(<span class="str">"strategi Robin scalping"</span>, top_k=<span class="str">5</span>)
+results = fusion_search(<span class="s">"scalping EURUSD"</span>, top_k=<span class="v">5</span>)
 
-<span class="cmt"># Filter by profile</span>
-results = fusion_search(<span class="str">"REITs Malaysia"</span>, profile=<span class="str">"nami"</span>)
+<span class="c"># Filter by profile</span>
+results = fusion_search(<span class="s">"REITs"</span>, profile=<span class="s">"nami"</span>)
 
-<span class="cmt"># Display in chat</span>
-answer = fusion_search(<span class="str">"apa pasal EURUSD"</span>, show=<span class="str">True</span>)
+<span class="c"># Chat display</span>
+answer = fusion_search(<span class="s">"apa pasal EURUSD"</span>, show=<span class="v">True</span>)
       </div>
     </div>
-
-    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
-      <span class="arrow">▼</span> 📝 Save to Wiki
-    </div>
-    <div class="collapse-content">
+    <div>
+      <div class="section-label" style="margin-bottom:4px;">Save to Wiki</div>
       <div class="code-block">
-<span class="kw">from</span> _save <span class="kw">import</span> save_page
+<span class="k">from</span> _save <span class="k">import</span> save_page
 
 result = save_page(
-    title=<span class="str">"Scalping Strategy EURUSD"</span>,
-    body=<span class="str">"Robin scalps EURUSD Asian session 9-11am."</span>,
-    profile=<span class="str">"robin"</span>,
-    <span class="cmt"># page_type auto-detected → investment-strategy</span>
-    tags=[<span class="str">"trading"</span>, <span class="str">"scalping"</span>],
-    relations=[(<span class="str">"Robin"</span>, <span class="str">"trades"</span>, <span class="str">"EURUSD"</span>)],
+    title=<span class="s">"Scalping Strategy"</span>,
+    body=<span class="s">"Robin scalps EURUSD 9-11am"</span>,
+    profile=<span class="s">"robin"</span>,
+    relations=[(<span class="s">"Robin"</span>, <span class="s">"trades"</span>, <span class="s">"EURUSD"</span>)]
 )
+<span class="c"># Auto: detect type, extract</span>
+<span class="c"># entities, update FTS5+KG+log</span>
       </div>
     </div>
-
-    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
-      <span class="arrow">▼</span> 📄 Synthesis + Gap Analysis
-    </div>
-    <div class="collapse-content">
+    <div>
+      <div class="section-label" style="margin-bottom:4px;">Synthesis + Gaps</div>
       <div class="code-block">
-<span class="kw">from</span> _synthesize <span class="kw">import</span> synthesize
+<span class="k">from</span> _synthesize <span class="k">import</span> synthesize
 
-<span class="cmt"># Full answer with citations + gaps</span>
-answer = synthesize(<span class="str">"Apa strategi trading Robin?"</span>)
+answer = synthesize(<span class="s">"Robin strategy?"</span>)
+<span class="c"># → 📌 Summary</span>
+<span class="c"># → ✅ Knows with 📍Source[N]</span>
+<span class="c"># → ⚠️ Gaps + confidence</span>
 
-<span class="cmt"># Raw data</span>
-result = synthesize(<span class="str">"Apa strategi trading Robin?"</span>, raw=<span class="str">True</span>)
-<span class="cmt"># result["answer"]   → synthesized answer</span>
-<span class="cmt"># result["gaps"]     → what's missing</span>
-<span class="cmt"># result["confidence"] → 0.0-1.0</span>
+raw = synthesize(<span class="s">"Robin strategy?"</span>, raw=<span class="v">True</span>)
+<span class="c"># raw["answer"], raw["gaps"]</span>
       </div>
     </div>
-
-    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
-      <span class="arrow">▼</span> 📡 Signal Detector
-    </div>
-    <div class="collapse-content">
+    <div>
+      <div class="section-label" style="margin-bottom:4px;">Signal Detector</div>
       <div class="code-block">
-<span class="kw">from</span> _wikisignal <span class="kw">import</span> capture_signal, detect_signals
+<span class="k">from</span> _wikisignal <span class="k">import</span> capture_signal
 
-<span class="cmt"># Quick capture (no LLM)</span>
-capture_signal(<span class="str">"preference"</span>, <span class="str">"Prefers async Python"</span>, <span class="str">"zorro"</span>, [<span class="str">"coding"</span>])
+<span class="c"># Quick capture, no LLM</span>
+capture_signal(<span class="s">"preference"</span>,
+    <span class="s">"Prefers async Python"</span>,
+    <span class="s">"zorro"</span>, [<span class="s">"coding"</span>])
 
-<span class="cmt"># LLM-based detection</span>
-signals = detect_signals(<span class="str">"Robin says scalping EURUSD is best"</span>, <span class="str">"robin"</span>)
-<span class="kw">for</span> s <span class="kw">in</span> signals:
-    capture_signal(s[<span class="str">"type"</span>], s[<span class="str">"content"</span>], <span class="str">"robin"</span>, s.get(<span class="str">"tags"</span>, []))
+<span class="c"># → signals/zorro-{date}.md</span>
+<span class="c"># → KG edge: zorro → prefers</span>
       </div>
     </div>
-
-    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
-      <span class="arrow">▼</span> 🔗 Typed Graph Edges
-    </div>
-    <div class="collapse-content">
+    <div>
+      <div class="section-label" style="margin-bottom:4px;">Typed Edges</div>
       <div class="code-block">
-<span class="kw">from</span> _kg <span class="kw">import</span> summarize_profile, get_connections_by_type, add_typed_edge
+<span class="k">from</span> _kg <span class="k">import</span> summarize_profile, add_typed_edge
 
-<span class="cmt"># Profile summary</span>
-print(summarize_profile(<span class="str">"robin"</span>))
-<span class="cmt"># → Trades: EURUSD | Prefers: Asian Session | Uses: TradingView</span>
+<span class="c"># Profile summary</span>
+print(summarize_profile(<span class="s">"robin"</span>))
+<span class="c"># Trades: EURUSD | Prefers: Scalping</span>
 
-<span class="cmt"># Add typed edge</span>
-add_typed_edge(<span class="str">"robin"</span>, <span class="str">"EURUSD"</span>, <span class="str">"trades"</span>, <span class="str">"Robin scalps EURUSD"</span>)
+<span class="c"># Add typed edge</span>
+add_typed_edge(<span class="s">"robin"</span>, <span class="s">"EURUSD"</span>,
+    <span class="s">"trades"</span>)
       </div>
     </div>
-
-    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
-      <span class="arrow">▼</span> 📊 Benchmark
-    </div>
-    <div class="collapse-content">
+    <div>
+      <div class="section-label" style="margin-bottom:4px;">Benchmark</div>
       <div class="code-block">
-<span class="cmt"># Run from terminal:</span>
-<span class="kw">cd</span> C:/Users/kevin/wiki
+<span class="c"># Terminal:</span>
 python _benchmark.py
 
-<span class="cmt"># Output:</span>
-<span class="cmt"># Recall@1: 77.8%</span>
-<span class="cmt"># Recall@3: 88.9%</span>
-<span class="cmt"># Recall@5: 88.9%</span>
-<span class="cmt"># MRR:      0.8333</span>
+<span class="c"># => Recall@1: 77.8%</span>
+<span class="c"># => Recall@3: 88.9%</span>
+<span class="c"># => Recall@5: 88.9%</span>
+<span class="c"># => MRR: 0.8333</span>
       </div>
     </div>
-
   </div>
-
 </div>
+</section>
 
-<!-- ===== FOOTER ===== -->
-<div class="footer">
-  LLM Wiki Upgraded v3.0 &nbsp;·&nbsp; 16 scripts &nbsp;·&nbsp; 3,800+ LOC &nbsp;·&nbsp; $0 API cost &nbsp;·&nbsp; 88.9% R@5
-  <br><br>
-  Built by Kevin with Hermes Agent — June 2026
+<!-- ─── FILES ─── -->
+<section class="alt">
+<div class="section-inner">
+  <div class="section-label">Codebase</div>
+  <h2 class="section-title">16 scripts, <em>3,800+ lines</em></h2>
+
+  <div class="file-grid">
+    <div class="file-row"><span class="icon">🐍</span><span class="fn">_fusion.py</span><span class="desc">4-signal fusion + CE reranker + recency</span><span class="file-tag new">new</span><span class="lines">491</span></div>
+    <div class="file-row"><span class="icon">🐍</span><span class="fn">_reason.py</span><span class="desc">Auto-reasoning + contradictions + trends</span><span class="file-tag new">new</span><span class="lines">466</span></div>
+    <div class="file-row"><span class="icon">🐍</span><span class="fn">_save.py</span><span class="desc">Auto-extract save + schema packs</span><span class="file-tag new">new</span><span class="lines">421</span></div>
+    <div class="file-row"><span class="icon">🐍</span><span class="fn">_kg.py</span><span class="desc">Knowledge graph + typed edges (15 types)</span><span class="file-tag upd">upd</span><span class="lines">700</span></div>
+    <div class="file-row"><span class="icon">🐍</span><span class="fn">_health.py</span><span class="desc">Health checks + stale page detection</span><span class="file-tag org">orig</span><span class="lines">355</span></div>
+    <div class="file-row"><span class="icon">🐍</span><span class="fn">_search.py</span><span class="desc">Vector search — ChromaDB + BGE-small</span><span class="file-tag upd">upd</span><span class="lines">270</span></div>
+    <div class="file-row"><span class="icon">🐍</span><span class="fn">_synthesize.py</span><span class="desc">Synthesis + gap analysis + structured</span><span class="file-tag new">new</span><span class="lines">237</span></div>
+    <div class="file-row"><span class="icon">🐍</span><span class="fn">_benchmark.py</span><span class="desc">Retrieval eval — R@1/3/5 + MRR</span><span class="file-tag new">new</span><span class="lines">212</span></div>
+    <div class="file-row"><span class="icon">🐍</span><span class="fn">_wikisignal.py</span><span class="desc">Real-time signal detector</span><span class="file-tag new">new</span><span class="lines">200</span></div>
+    <div class="file-row"><span class="icon">🐍</span><span class="fn">_update_index.py</span><span class="desc">Auto-build index.md</span><span class="file-tag org">orig</span><span class="lines">185</span></div>
+    <div class="file-row"><span class="icon">🐍</span><span class="fn">_autobacklink.py</span><span class="desc">Auto-backlink detection</span><span class="file-tag org">orig</span><span class="lines">159</span></div>
+    <div class="file-row"><span class="icon">🐍</span><span class="fn">_reindex.py</span><span class="desc">Rebuild all indexes</span><span class="file-tag upd">upd</span><span class="lines">36</span></div>
+    <div class="file-row"><span class="icon">📄</span><span class="fn">_schema.yaml</span><span class="desc">Page type definitions (10 types)</span><span class="file-tag new">new</span><span class="lines">120</span></div>
+    <div class="file-row"><span class="icon">📄</span><span class="fn">_profiles.json</span><span class="desc">Profile config</span><span class="file-tag org">orig</span><span class="lines">—</span></div>
+  </div>
 </div>
+</section>
+
+<!-- ─── TIMELINE ─── -->
+<section id="timeline" style="padding-bottom:80px;">
+<div class="section-inner">
+  <div class="section-label">History</div>
+  <h2 class="section-title">June <em>2026</em> upgrade timeline</h2>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="date">Jun 17</div>
+      <h4>Foundation</h4>
+      <p>Karpathy-style markdown wiki. _search.py (ChromaDB MiniLM), _kg.py (SQLite), _reindex.py.</p>
+    </div>
+    <div class="tl-item">
+      <div class="date">Jun 17</div>
+      <h4>FTS5 + Page Metadata</h4>
+      <p>Added page_fts virtual table, page_metadata, search_by_profile/tag/date, stale_pages().</p>
+    </div>
+    <div class="tl-item">
+      <div class="date">Jun 20</div>
+      <h4>Multi-Signal Fusion</h4>
+      <p>_fusion.py — 4 signals (vector + FTS5 + entity + KG) + RRF merge. Profile filter. Dedup.</p>
+    </div>
+    <div class="tl-item">
+      <div class="date">Jun 20</div>
+      <h4>Auto-Extract Save</h4>
+      <p>_save.py — YAML frontmatter, folder routing, auto-extract entities, FTS5+KG+log+index update.</p>
+    </div>
+    <div class="tl-item">
+      <div class="date">Jun 20</div>
+      <h4>Cross-Encoder Reranker</h4>
+      <p>ms-marco-MiniLM-L-6-v2 (88MB) — local ONNX. RRF → CE pipeline. Zero API cost.</p>
+    </div>
+    <div class="tl-item">
+      <div class="date">Jun 25</div>
+      <h4>Auto-Reasoning Cron</h4>
+      <p>_reason.py — scan sessions, LLM extract observations. Cron 12h. 10 profiles auto.</p>
+    </div>
+    <div class="tl-item">
+      <div class="date">Jun 25-26</div>
+      <h4>Final Upgrades</h4>
+      <p>Auto entity extraction on save. Deductive LLM prompt. KG+Vector fusion. Trend detection. Recency/forgetting.</p>
+    </div>
+    <div class="tl-item">
+      <div class="date">Jun 26</div>
+      <h4>GBrain-inspired</h4>
+      <p>Typed graph edges (15 types), _synthesize.py (synthesis + gap), better dedup.</p>
+    </div>
+    <div class="tl-item">
+      <div class="date">Jun 27</div>
+      <h4>Signal + Schema + Benchmark</h4>
+      <p>_wikisignal.py (real-time capture), _schema.yaml (10 page types), _benchmark.py (88.9% R@5).</p>
+    </div>
+    <div class="tl-item">
+      <div class="date">Jun 27</div>
+      <h4>Final Tuning</h4>
+      <p>BGE-small embedding (multilingual), contradiction detection, structured synthesis + pre-gaps.</p>
+      <div class="detail">3,800+ LOC | 16 scripts | $0 API cost | 10 phases in 10 days</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<style>
+nav a[href="#arch"], nav a[href="#features"], nav a[href="#bench"],
+nav a[href="#compare"], nav a[href="#code"], nav a[href="#timeline"] {
+  scroll-margin-top: 56px;
+}
+</style>
 
 <script>
-  function showTab(tabId) {
-    // Hide all tabs
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    // Show selected
-    document.getElementById('tab-' + tabId).classList.add('active');
-    event.target.classList.add('active');
-  }
-
-  // Animate score bars on load
-  document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-      document.querySelectorAll('.score-bar-fill').forEach(function(bar) {
-        var w = bar.style.width;
-        bar.style.width = '0';
-        setTimeout(function() { bar.style.width = w; }, 50);
-      });
-    }, 100);
+// Active nav highlight on scroll
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('nav a');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      document.querySelector(`nav a[href="#${entry.target.id}"]`)?.classList.add('active');
+    }
   });
+}, { threshold: 0.3 });
+sections.forEach(s => observer.observe(s));
+
+// Animate bars on load
+setTimeout(() => {
+  document.querySelectorAll('.bar-fill').forEach(b => {
+    const w = b.style.width;
+    b.style.width = '0';
+    setTimeout(() => { b.style.width = w; }, 100);
+  });
+}, 200);
 </script>
 
 </body>
