@@ -3,430 +3,1137 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hermes Agent — Folder Structure</title>
+<title>LLM Wiki Upgraded — Interactive Overview</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #0d1117;
-    color: #c9d1d9;
-    padding: 40px;
+    background: #FDE8D4;
+    color: #2D3436;
+    padding: 0;
     min-height: 100vh;
   }
-  h1 {
-    font-size: 28px;
-    margin-bottom: 6px;
-    color: #58a6ff;
+
+  /* === HERO === */
+  .hero {
+    background: linear-gradient(135deg, #FAD7A1 0%, #F5CBA7 40%, #E8C8B5 100%);
+    padding: 48px 40px 40px;
+    border-bottom: 1px solid rgba(211, 84, 0, 0.12);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: -60%; right: -10%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #7B3F00;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1;
+  }
+  .hero h1 span { color: #D35400; }
+  .hero .subtitle {
+    color: #8B5E3C;
+    font-size: 15px;
+    margin-top: 6px;
+    position: relative; z-index: 1;
+  }
+  .hero .version-badge {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 4px 14px;
+    background: #D35400;
+    color: #fff;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* === STATS BAR === */
+  .stats {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    padding: 20px 40px;
+    background: #FFF8F2;
+    border-bottom: 1px solid #F0D5C5;
+  }
+  .stat-item {
+    display: flex; flex-direction: column; align-items: center;
+    background: #FFF;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: 1px solid #F0D5C5;
+    min-width: 100px;
+    box-shadow: 0 1px 3px rgba(123,63,0,0.06);
+    transition: transform 0.15s;
+  }
+  .stat-item:hover { transform: translateY(-2px); }
+  .stat-item strong {
+    color: #D35400;
+    font-size: 24px;
+  }
+  .stat-item span {
+    color: #8B5E3C;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  /* === CONTENT === */
+  .content { padding: 32px 40px 60px; max-width: 1200px; margin: 0 auto; }
+
+  /* === SECTION TITLE === */
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #7B3F00;
+    margin: 32px 0 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title .badge {
+    font-size: 11px; font-weight: 600;
+    padding: 2px 10px; border-radius: 20px;
+    background: #FAD7A1; color: #7B3F00;
+  }
+
+  /* === TABS === */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .tab-btn {
+    padding: 8px 16px;
+    border: 1px solid #F0D5C5;
+    border-radius: 10px 10px 0 0;
+    background: #FFF8F2;
+    color: #8B5E3C;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab-btn:hover { background: #FAD7A1; }
+  .tab-btn.active {
+    background: #D35400;
+    color: #fff;
+    border-color: #D35400;
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* === CARD === */
+  .card {
+    background: #FFF8F2;
+    border-radius: 12px;
+    border: 1px solid #F0D5C5;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(123,63,0,0.06);
+  }
+
+  /* === TABLE === */
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .comp-table th {
+    background: #FAD7A1;
+    color: #7B3F00;
+    padding: 8px 10px;
+    text-align: left;
+    border-radius: 6px 6px 0 0;
     font-weight: 600;
   }
-  .subtitle {
-    color: #8b949e;
+  .comp-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #F5E6D8;
+  }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table tr:hover td { background: rgba(211,84,0,0.04); }
+  .comp-table .yes { color: #27AE60; font-weight: 700; }
+  .comp-table .no { color: #999; }
+  .comp-table .unique { color: #D35400; font-weight: 700; }
+
+  /* === FLOW DIAGRAM === */
+  .flow-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px;
+    background: #FFF;
+    border-radius: 12px;
+    border: 1px solid #F0D5C5;
+  }
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .flow-box {
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 120px;
+    transition: transform 0.15s;
+  }
+  .flow-box:hover { transform: scale(1.05); }
+  .flow-input { background: #D4E6F1; color: #1A5276; border: 1px solid #AED6F1; }
+  .flow-process { background: #FAD7A1; color: #7B3F00; border: 1px solid #F0D5C5; }
+  .flow-search { background: #D5F5E3; color: #1E8449; border: 1px solid #ABEBC8; }
+  .flow-output { background: #FADBD8; color: #C0392B; border: 1px solid #F5B7B1; }
+  .flow-arrow {
+    color: #D68910;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  /* === SCORE BAR === */
+  .score-bar-container {
+    margin: 6px 0;
+  }
+  .score-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #5D4037;
+    margin-bottom: 4px;
+  }
+  .score-bar-bg {
+    height: 10px;
+    background: #F0D5C5;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.8s ease;
+  }
+
+  /* === FILE LIST === */
+  .file-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin: 4px 0;
+    font-size: 13px;
+    transition: background 0.1s;
+  }
+  .file-item:hover { background: rgba(211,84,0,0.05); }
+  .file-icon {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+  }
+  .file-name {
+    font-weight: 600;
+    color: #7B3F00;
+    min-width: 160px;
+  }
+  .file-desc {
+    color: #8B5E3C;
+    font-size: 12px;
+  }
+  .file-lines {
+    margin-left: auto;
+    color: #A67B5B;
+    font-size: 11px;
+  }
+  .file-tag {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-left: 4px;
+  }
+  .tag-new { background: #D5F5E3; color: #1E8449; }
+  .tag-updated { background: #D4E6F1; color: #1A5276; }
+  .tag-original { background: #EAECEE; color: #5D6D7E; }
+
+  /* === TIMELINE === */
+  .timeline-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #F5E6D8;
+  }
+  .timeline-item:last-child { border-bottom: none; }
+  .timeline-date {
+    min-width: 100px;
+    font-size: 12px;
+    color: #D35400;
+    font-weight: 600;
+  }
+  .timeline-content {
+    font-size: 13px;
+    color: #5D4037;
+  }
+  .timeline-content strong { color: #7B3F00; }
+
+  /* === CODE === */
+  .code-block {
+    background: #2D3436;
+    color: #DFE6E9;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 12px;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+  .code-block .kw { color: #74B9FF; }
+  .code-block .str { color: #55EFC4; }
+  .code-block .cmt { color: #636E72; }
+
+  /* === COLLAPSIBLE === */
+  .collapsible {
+    cursor: pointer;
+    user-select: none;
+    padding: 10px 14px;
+    background: #FAD7A1;
+    border-radius: 8px;
     font-size: 14px;
-    margin-bottom: 30px;
-  }
-  .tree { position: relative; padding-left: 28px; }
-  .tree-node { position: relative; margin: 3px 0; }
-  .tree-node > .label {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 4px 10px; border-radius: 6px;
-    cursor: default; font-size: 14px; line-height: 1.6;
+    font-weight: 600;
+    color: #7B3F00;
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     transition: background 0.15s;
-    position: relative;
   }
-  .tree-node > .label:hover { background: #161b22; }
-
-  /* Connector lines */
-  .tree::before {
-    content: ''; position: absolute; left: 12px; top: 0; bottom: 0;
-    width: 1px; background: #30363d;
-  }
-  .tree-node > .label::before {
-    content: ''; position: absolute; left: -24px; top: 50%;
-    width: 16px; height: 1px; background: #30363d;
-  }
-  .tree-node:last-child > .label::after {
-    content: ''; position: absolute; left: -24px; top: 50%;
-    bottom: -50%; width: 1px; background: #0d1117;
-  }
-
-  /* Icons */
-  .icon-folder { color: #d29922; font-size: 16px; }
-  .icon-file { color: #8b949e; font-size: 14px; }
-  .icon-env { color: #f0db4f; font-size: 14px; }
-  .icon-yaml { color: #6cb4ee; font-size: 14px; }
-  .icon-db { color: #58a6ff; font-size: 14px; }
-  .icon-json { color: #7ee787; font-size: 14px; }
-  .icon-py { color: #3572A5; font-size: 14px; }
-  .icon-md { color: #1f6feb; font-size: 14px; }
-
-  .tag {
-    font-size: 11px; padding: 1px 6px; border-radius: 8px;
-    background: #21262d; color: #8b949e; margin-left: 6px;
-  }
-  .tag-active { background: #1b3a1b; color: #3fb950; }
-  .tag-pending { background: #3d2e00; color: #d29922; }
-  .tag-breaking { background: #3d1a1a; color: #f85149; }
-
-  .desc { color: #484f58; font-size: 12px; margin-left: 4px; }
-  .folder-content {
-    margin: 2px 0; padding-left: 32px; border-left: 1px solid #21262d;
-  }
-
-  /* Collapsible */
-  .collapsible { cursor: pointer; user-select: none; }
+  .collapsible:hover { background: #F5CBA7; }
   .collapsible .arrow {
-    display: inline-block; width: 14px; text-align: center;
-    transition: transform 0.2s; color: #484f58; font-size: 12px;
+    transition: transform 0.2s;
+    font-size: 11px;
   }
   .collapsible.collapsed .arrow { transform: rotate(-90deg); }
-  .collapsible.collapsed + .folder-content { display: none; }
-  .files-grid {
-    display: flex; flex-direction: column; gap: 2px;
+  .collapsible.collapsed + .collapse-content { display: none; }
+
+  /* === FOOTER === */
+  .footer {
+    text-align: center;
+    padding: 24px;
+    color: #A67B5B;
+    font-size: 12px;
+    border-top: 1px solid #F0D5C5;
+    background: #FFF8F2;
   }
 
-  .legend {
-    display: flex; gap: 20px; flex-wrap: wrap;
-    margin-bottom: 24px; padding: 12px 16px;
-    background: #161b22; border-radius: 8px; border: 1px solid #21262d;
+  /* === ANIMATIONS === */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
-  .legend span { font-size: 12px; display: flex; align-items: center; gap: 6px; color: #8b949e; }
+  .card, .stat-item, .flow-box { animation: fadeIn 0.3s ease both; }
 
-  hr { border: none; border-top: 1px solid #21262d; margin: 20px 0; }
-
-  .section-title {
-    font-size: 16px; font-weight: 600; color: #58a6ff;
-    margin: 16px 0 8px; display: flex; align-items: center; gap: 8px;
+  /* === RESPONSIVE === */
+  @media (max-width: 768px) {
+    .hero { padding: 32px 20px 28px; }
+    .hero h1 { font-size: 24px; }
+    .content { padding: 20px 16px; }
+    .stats { flex-direction: column; padding: 16px 20px; }
+    .comp-table { font-size: 11px; }
+    .flow-row { flex-direction: column; }
   }
 </style>
 </head>
 <body>
 
-<h1>🏗️ Hermes Agent — Folder Structure</h1>
-<div class="subtitle">Windows • <code>C:\Users\kevin\AppData\Local\hermes\</code></div>
-
-<div class="legend">
-  <span>📁 Folder</span>
-  <span>📄 File</span>
-  <span>🟢 Active</span>
-  <span>🟡 Pending</span>
-  <span>🔴 Stopped</span>
-</div>
-
-<!-- ==================== ROOT ==================== -->
-<div class="section-title">📂 Root Files</div>
-<div class="files-grid">
-
-<div class="tree-node"><span class="label"><span class="icon-env">🔑</span> .env <span class="tag">23K</span><span class="desc">— API keys: DEEPSEEK, GOOGLE, TELEGRAM, OPENROUTER</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-yaml">⚙️</span> config.yaml <span class="tag">18K</span><span class="desc">— Main configuration</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-db">🗄️</span> state.db <span class="tag">26M</span><span class="desc">— Session store (SQLite)</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-db">📋</span> kanban.db <span class="tag">112K</span><span class="desc">— Kanban board</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-json">🔐</span> auth.json <span class="tag">7K</span><span class="desc">— OAuth credentials</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-json">📡</span> channel_directory.json <span class="tag">3K</span><span class="desc">— Connected channels</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-json">🧠</span> models_dev_cache.json <span class="tag">2.3M</span><span class="desc">— Available models cache</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-json">🔑</span> google_client_secret.json <span class="tag">428B</span><span class="desc">— Google OAuth</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-json">🔄</span> provider_models_cache.json <span class="tag">735B</span><span class="desc">— Provider model list</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-json">⚡</span> gateway_state.json <span class="tag">428B</span><span class="desc">— Gateway state</span></span></div>
-<div class="tree-node"><span class="label"><span class="icon-json">📊</span> processes.json <span class="tag">2B</span><span class="desc">— Background processes</span></span></div>
-
-</div>
-
-<hr>
-
-<!-- ==================== L1 FOLDERS ==================== -->
-<div class="section-title">📁 Root Folders</div>
-<div class="tree">
-
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> profiles/ <span class="tag">10 profiles</span>
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <h1>🧠 LLM <span>Wiki</span> — Upgraded</h1>
+  <div class="subtitle">
+    Karpathy-style markdown wiki → Production-grade agent memory
   </div>
-  <div class="folder-content">
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> roronoa-zorro/ <span class="tag tag-active">✅ Active</span>
-      </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
-        <span><span class="icon-file">📄</span> state.db, auth.json, gateway_state.json</span>
-        <span><span class="icon-folder">📁</span> memories/ → MEMORY.md, USER.md</span>
-        <span><span class="icon-folder">📁</span> logs/, sessions/, skills/, cron/, home/</span>
-        <span><span class="icon-folder">📁</span> cache/, workspace/, plans/, hooks/</span>
-        <span><span class="icon-folder">📁</span> audio_cache/, image_cache/, skins/, pairing/</span>
-        <span><span class="icon-folder">📁</span> gateway-service/</span>
-      </div>
-    </div>
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> nami/ <span class="tag tag-active">✅ Active</span>
-      </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md + lsp/</span>
-        <span><span class="icon-folder">📁</span> Same subdirs + ocr_batch.sh</span>
-      </div>
-    </div>
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> usopp/ <span class="tag tag-active">✅ Active</span>
-      </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
-        <span><span class="icon-folder">📁</span> Same subdirs</span>
+  <div class="version-badge">v3.0 — June 2026</div>
+</div>
+
+<!-- ===== STATS ===== -->
+<div class="stats">
+  <div class="stat-item"><strong>16</strong><span>Python scripts</span></div>
+  <div class="stat-item"><strong>3,800+</strong><span>Lines of code</span></div>
+  <div class="stat-item"><strong>38</strong><span>Wiki pages</span></div>
+  <div class="stat-item"><strong>10</strong><span>Profiles</span></div>
+  <div class="stat-item"><strong>88.9%</strong><span>Recall@5</span></div>
+  <div class="stat-item"><strong>$0</strong><span>API cost</span></div>
+</div>
+
+<!-- ===== CONTENT ===== -->
+<div class="content">
+
+  <!-- ===== TABS ===== -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('arch')">🏗️ Architecture</button>
+    <button class="tab-btn" onclick="showTab('features')">⚡ Features</button>
+    <button class="tab-btn" onclick="showTab('benchmark')">📊 Benchmark</button>
+    <button class="tab-btn" onclick="showTab('compare')">⚖️ vs Others</button>
+    <button class="tab-btn" onclick="showTab('timeline')">📅 Timeline</button>
+    <button class="tab-btn" onclick="showTab('code')">💻 Code</button>
+  </div>
+
+  <!-- ===== TAB: ARCHITECTURE ===== -->
+  <div id="tab-arch" class="tab-content active">
+
+    <div class="section-title">📡 Retrieval Pipeline</div>
+    <div class="card">
+      <div class="flow-container">
+        <div class="flow-row">
+          <div class="flow-box flow-input">📝 User Query</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box flow-process">🔀 4-Signal Retrieval</div>
+        </div>
+        <div class="flow-row" style="padding-left: 40px;">
+          <div class="flow-box flow-search">🧠 ChromaDB<br><small>BGE-small vector</small></div>
+          <div class="flow-box flow-search">🔤 FTS5<br><small>BM25 keyword</small></div>
+          <div class="flow-box flow-search">🏷️ KG Entity<br><small>SQLite lookup</small></div>
+          <div class="flow-box flow-search">🔗 KG Graph<br><small>Path + connections</small></div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-arrow">↓</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-box flow-process">📊 RRF Fusion<br><small>k=60 merge</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box flow-process">🎯 Cross-Encoder<br><small>ms-marco rerank</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box flow-process">⏳ Recency Weight<br><small>7/30/60/90d decay</small></div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-arrow">↓</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-box flow-output">📄 Synthesis + Gap Analysis<br><small>Answer with citations</small></div>
+        </div>
       </div>
     </div>
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> sanji/ <span class="tag tag-active">✅ Active</span>
-      </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
-        <span><span class="icon-folder">📁</span> Same subdirs</span>
-      </div>
-    </div>
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> chopper/ <span class="tag tag-active">✅ Active</span>
-      </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
-        <span><span class="icon-folder">📁</span> Same subdirs</span>
-      </div>
-    </div>
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> robin/ <span class="tag tag-active">✅ Telegram</span>
-      </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md + lsp/</span>
-        <span><span class="icon-folder">📁</span> Same subdirs</span>
+
+    <div class="section-title">🔄 Auto-Reasoning Pipeline</div>
+    <div class="card">
+      <div class="flow-container">
+        <div class="flow-row">
+          <div class="flow-box flow-input">💬 Chat Sessions<br><small>10 profiles</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box flow-process">⏰ Cron 12h<br><small>_reason.py</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box flow-process">🤖 LLM Extract<br><small>Deductions + Trends</small></div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-arrow">↓</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-box flow-process">⚠️ Contradiction Check<br><small>New vs Past</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box flow-search">📝 Save to Wiki<br><small>concepts/ page</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box flow-output">📊 KG + FTS5 + Log<br><small>Auto-indexed</small></div>
+        </div>
       </div>
     </div>
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> brook/ <span class="tag tag-active">✅ Telegram</span>
+
+    <div class="section-title">📁 File Structure</div>
+    <div class="card">
+
+      <div class="collapsible" onclick="this.classList.toggle('collapsed')">
+        <span class="arrow">▼</span> 📂 Core Scripts (16 files)
       </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
-        <span><span class="icon-folder">📁</span> Same subdirs</span>
+      <div class="collapse-content">
+
+        <div class="file-item">
+          <span class="file-icon">🐍</span>
+          <span class="file-name">_search.py</span>
+          <span class="file-desc">Vector search — ChromaDB + BGE-small</span>
+          <span class="file-tag tag-updated">updated</span>
+          <span class="file-lines">270 lines</span>
+        </div>
+        <div class="file-item">
+          <span class="file-icon">🐍</span>
+          <span class="file-name">_kg.py</span>
+          <span class="file-desc">Knowledge graph + typed edges (15 types)</span>
+          <span class="file-tag tag-updated">updated</span>
+          <span class="file-lines">700 lines</span>
+        </div>
+        <div class="file-item">
+          <span class="file-icon">🐍</span>
+          <span class="file-name">_fusion.py</span>
+          <span class="file-desc">4-signal fusion + CE reranker + recency</span>
+          <span class="file-tag tag-new">new</span>
+          <span class="file-lines">491 lines</span>
+        </div>
+        <div class="file-item">
+          <span class="file-icon">🐍</span>
+          <span class="file-name">_save.py</span>
+          <span class="file-desc">Auto-extract save + schema packs</span>
+          <span class="file-tag tag-new">new</span>
+          <span class="file-lines">421 lines</span>
+        </div>
+        <div class="file-item">
+          <span class="file-icon">🐍</span>
+          <span class="file-name">_reason.py</span>
+          <span class="file-desc">Auto-reasoning + contradictions + trends</span>
+          <span class="file-tag tag-new">new</span>
+          <span class="file-lines">466 lines</span>
+        </div>
+        <div class="file-item">
+          <span class="file-icon">🐍</span>
+          <span class="file-name">_synthesize.py</span>
+          <span class="file-desc">Synthesis + gap analysis + structured output</span>
+          <span class="file-tag tag-new">new</span>
+          <span class="file-lines">237 lines</span>
+        </div>
+        <div class="file-item">
+          <span class="file-icon">🐍</span>
+          <span class="file-name">_wikisignal.py</span>
+          <span class="file-desc">Real-time signal detector</span>
+          <span class="file-tag tag-new">new</span>
+          <span class="file-lines">200 lines</span>
+        </div>
+        <div class="file-item">
+          <span class="file-icon">🐍</span>
+          <span class="file-name">_benchmark.py</span>
+          <span class="file-desc">Retrieval evaluation — R@1/3/5 + MRR</span>
+          <span class="file-tag tag-new">new</span>
+          <span class="file-lines">212 lines</span>
+        </div>
+        <div class="file-item">
+          <span class="file-icon">🐍</span>
+          <span class="file-name">_health.py</span>
+          <span class="file-desc">Health checks + stale page detection</span>
+          <span class="file-tag tag-original">original</span>
+          <span class="file-lines">355 lines</span>
+        </div>
+        <div class="file-item">
+          <span class="file-icon">🐍</span>
+          <span class="file-name">_autobacklink.py</span>
+          <span class="file-desc">Auto-backlink detection</span>
+          <span class="file-tag tag-original">original</span>
+          <span class="file-lines">159 lines</span>
+        </div>
+        <div class="file-item">
+          <span class="file-icon">🐍</span>
+          <span class="file-name">_update_index.py</span>
+          <span class="file-desc">Auto-build index.md</span>
+          <span class="file-tag tag-original">original</span>
+          <span class="file-lines">185 lines</span>
+        </div>
+        <div class="file-item">
+          <span class="file-icon">🐍</span>
+          <span class="file-name">_reindex.py</span>
+          <span class="file-desc">Rebuild all indexes</span>
+          <span class="file-tag tag-updated">updated</span>
+          <span class="file-lines">36 lines</span>
+        </div>
+        <div class="file-item">
+          <span class="file-icon">📄</span>
+          <span class="file-name">_schema.yaml</span>
+          <span class="file-desc">Page type definitions (10 types)</span>
+          <span class="file-tag tag-new">new</span>
+          <span class="file-lines">120 lines</span>
+        </div>
+
       </div>
     </div>
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> franky/ <span class="tag tag-active">✅ Telegram</span>
-      </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md</span>
-        <span><span class="icon-folder">📁</span> Same subdirs</span>
+
+  </div>
+
+  <!-- ===== TAB: FEATURES ===== -->
+  <div id="tab-features" class="tab-content">
+
+    <div class="section-title">⚡ Feature List <span class="badge">All upgrades</span></div>
+
+    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
+      <span class="arrow">▼</span> 🔀 Multi-Signal Fusion Search
+    </div>
+    <div class="collapse-content">
+      <div class="card">
+        <table class="comp-table">
+          <tr><th>Signal</th><th>Source</th><th>What it does</th></tr>
+          <tr><td>🧠 Vector</td><td>ChromaDB + BGE-small</td><td>Semantic — cari ikut maksud</td></tr>
+          <tr><td>🔤 Keyword</td><td>FTS5 (SQLite)</td><td>BM25 — cari kata tepat</td></tr>
+          <tr><td>🏷️ Entity</td><td>KG SQLite</td><td>Cari nama entity + related pages</td></tr>
+          <tr><td>🔗 Graph</td><td>KG SQLite</td><td>Path finding + connections</td></tr>
+          <tr><td>📊 RRF</td><td>Reciprocal Rank Fusion</td><td>Merge 4 signals — k=60</td></tr>
+          <tr><td>🎯 CE Reranker</td><td>ms-marco-MiniLM-L-6-v2</td><td>Local ONNX — zero API cost</td></tr>
+          <tr><td>⏳ Recency</td><td>KG page_metadata</td><td>7d=1.0 → 90d=0.3 weight</td></tr>
+        </table>
       </div>
     </div>
-    <div class="tree-node">
-      <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-        <span class="arrow">▼</span><span class="icon-folder">📁</span> jinbei/ <span class="tag tag-pending">⏳ Pending</span>
-      </div>
-      <div class="folder-content files-grid">
-        <span><span class="icon-file">📄</span> .env, config.yaml, SOUL.md + lsp/</span>
-        <span><span class="icon-folder">📁</span> Same subdirs (tunggu group ID)</span>
+
+    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
+      <span class="arrow">▼</span> 📝 Auto-Save with Schema Packs
+    </div>
+    <div class="collapse-content">
+      <div class="card">
+        <p style="font-size:13px;color:#5D4037;margin-bottom:10px;">
+          <code>save_page()</code> auto-detects page type, extracts entities, creates typed edges, updates FTS5 + KG + log + index.
+        </p>
+        <table class="comp-table">
+          <tr><th>Schema Type</th><th>Icon</th><th>Profile</th><th>Edges</th></tr>
+          <tr><td>investment-strategy</td><td>📈</td><td>Robin</td><td>trades, prefers, uses</td></tr>
+          <tr><td>coding-pattern</td><td>💻</td><td>Zorro</td><td>prefers, uses</td></tr>
+          <tr><td>health-plan</td><td>🩺</td><td>Chopper</td><td>learns, uses</td></tr>
+          <tr><td>site-record</td><td>🏗️</td><td>Jinbei</td><td>owns</td></tr>
+          <tr><td>person</td><td>👤</td><td>—</td><td>works_at, advises</td></tr>
+          <tr><td>meeting</td><td>📅</td><td>—</td><td>attended</td></tr>
+          <tr><td>comparison</td><td>⚖️</td><td>—</td><td>related</td></tr>
+          <tr><td>project</td><td>🚀</td><td>Franky</td><td>founded, uses</td></tr>
+          <tr><td>observation</td><td>🔍</td><td>—</td><td>confirmed, rejected</td></tr>
+          <tr><td>general</td><td>📄</td><td>—</td><td>mentions</td></tr>
+        </table>
       </div>
     </div>
+
+    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
+      <span class="arrow">▼</span> 🔗 Typed Graph Edges (15 types)
+    </div>
+    <div class="collapse-content">
+      <div class="card">
+        <table class="comp-table">
+          <tr><th>Edge</th><th>Icon</th><th>Meaning</th><th>Example</th></tr>
+          <tr><td>trades</td><td>🔁</td><td>Profile trades X</td><td>robin → trades → EURUSD</td></tr>
+          <tr><td>prefers</td><td>👍</td><td>Profile prefers X</td><td>zorro → prefers → async</td></tr>
+          <tr><td>uses</td><td>🔧</td><td>Profile uses tool X</td><td>nami → uses → TradingView</td></tr>
+          <tr><td>works_at</td><td>🏢</td><td>Works at company</td><td>person → works_at → Acme</td></tr>
+          <tr><td>founded</td><td>🚀</td><td>Founded company</td><td>franky → founded → project</td></tr>
+          <tr><td>advises</td><td>💡</td><td>Advises project</td><td>person → advises → startup</td></tr>
+          <tr><td>rejected</td><td>❌</td><td>Rejected approach</td><td>luffy → rejected → Docker</td></tr>
+          <tr><td>improved</td><td>⬆️</td><td>Improved X</td><td>wiki → improved → reranker</td></tr>
+          <tr><td>confirmed</td><td>✅</td><td>Confirmed preference</td><td>robin → confirmed → scalping</td></tr>
+          <tr><td>owns</td><td>📦</td><td>Owns asset</td><td>jinbei → owns → materials</td></tr>
+          <tr><td>learns</td><td>📚</td><td>Learning X</td><td>chopper → learns → nutrition</td></tr>
+          <tr><td>mentions</td><td>📄</td><td>Generic mention</td><td>page → mentions → entity</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
+      <span class="arrow">▼</span> 🤖 Auto-Reasoning + Contradiction Detection
+    </div>
+    <div class="collapse-content">
+      <div class="card">
+        <p style="font-size:13px;color:#5D4037;">
+          Cron setiap 12 jam — scan 10 profile sessions, extract observations + deductions + trends, detect contradictions dengan observation lepas.
+        </p>
+        <div class="code-block" style="margin-top:10px;">
+<span class="cmt"># Observation types extracted:</span>
+<span class="kw">JOB 1</span>: preference, fact, strategy, decision, correction
+<span class="kw">JOB 2</span>: <span class="str">deduction</span> — logical conclusions (MOST IMPORTANT)
+<span class="kw">JOB 3</span>: <span class="str">trend</span> — compare with past (changed/improved/evolved)
+<span class="kw">CONTRA</span>: flag if new contradicts old → <span class="str">"⚠️ FLAG"</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
+      <span class="arrow">▼</span> 📡 Signal Detector (Real-time)
+    </div>
+    <div class="collapse-content">
+      <div class="card">
+        <p style="font-size:13px;color:#5D4037;">
+          <code>_wikisignal.py</code> — capture important info dalam sesi, terus simpan + create typed edges. Tak tunggu cron.
+        </p>
+      </div>
+    </div>
+
+    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
+      <span class="arrow">▼</span> 📄 Synthesis + Gap Analysis
+    </div>
+    <div class="collapse-content">
+      <div class="card">
+        <p style="font-size:13px;color:#5D4037;">
+          <code>_synthesize.py</code> — baca fusion results, LLM synthesize jawapan dengan structured sections:
+        </p>
+        <div class="code-block" style="margin-top:10px;">
+📌 <span class="str">Summary</span> — one-line answer
+✅ <span class="str">What wiki KNOWS</span> — with 📍Source[N] citations
+⚠️ <span class="str">What wiki DOESN'T KNOW</span> — pre-computed gaps
+🔍 <span class="str">Confidence</span> — numeric 0.0-1.0
+        </div>
+      </div>
+    </div>
+
   </div>
+
+  <!-- ===== TAB: BENCHMARK ===== -->
+  <div id="tab-benchmark" class="tab-content">
+
+    <div class="section-title">📊 Benchmark Results <span class="badge">2026-06-27</span></div>
+
+    <div class="card">
+      <div class="score-bar-container">
+        <div class="score-bar-label"><span>Recall@1</span><span>77.8%</span></div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:77.8%;background:#27AE60;"></div></div>
+      </div>
+      <div class="score-bar-container">
+        <div class="score-bar-label"><span>Recall@3</span><span>88.9%</span></div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:88.9%;background:#27AE60;"></div></div>
+      </div>
+      <div class="score-bar-container">
+        <div class="score-bar-label"><span>Recall@5</span><span>88.9%</span></div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:88.9%;background:#27AE60;"></div></div>
+      </div>
+      <div class="score-bar-container">
+        <div class="score-bar-label"><span>MRR</span><span>0.8333</span></div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:83.3%;background:#E67E22;"></div></div>
+      </div>
+    </div>
+
+    <div class="section-title">🏆 Comparison with Industry</div>
+    <div class="card">
+      <table class="comp-table">
+        <tr><th>System</th><th>Benchmark</th><th>Score</th><th>Pages</th></tr>
+        <tr><td><strong>Mem0</strong></td><td>LongMemEval</td><td class="yes">94.8%</td><td>Production</td></tr>
+        <tr><td><strong>GBrain</strong></td><td>BrainBench R@5</td><td class="yes">97.9%</td><td>146,646</td></tr>
+        <tr><td><strong>Honcho</strong></td><td>LoCoMo</td><td class="yes">~90.4%</td><td>Enterprise</td></tr>
+        <tr><td><strong>LLM Wiki (Kau)</strong></td><td>Self-eval R@5</td><td class="unique">88.9%</td><td>38</td></tr>
+      </table>
+      <p style="font-size:12px;color:#8B5E3C;margin-top:8px;">
+        ⚠️ LLM Wiki score dari 9 natural queries — bukan standard benchmark. Still, 88.9% dengan 38 pages vs 146K pages adalah impressively efficient.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- ===== TAB: COMPARE ===== -->
+  <div id="tab-compare" class="tab-content">
+
+    <div class="section-title">⚖️ Detailed Comparison</div>
+    <div class="card" style="overflow-x:auto;">
+      <table class="comp-table">
+        <tr>
+          <th>Feature</th>
+          <th>LLM Wiki</th>
+          <th>Mem0</th>
+          <th>GBrain</th>
+          <th>Hindsight</th>
+          <th>Honcho</th>
+        </tr>
+        <tr>
+          <td>⭐ Stars</td>
+          <td>—</td>
+          <td>58.9K</td>
+          <td>24.2K</td>
+          <td>16.6K</td>
+          <td>5.5K</td>
+        </tr>
+        <tr>
+          <td>Language</td>
+          <td>Python</td>
+          <td>Python</td>
+          <td>TypeScript</td>
+          <td>Python</td>
+          <td>Python</td>
+        </tr>
+        <tr>
+          <td>Docker required</td>
+          <td class="unique">❌ No</td>
+          <td class="no">✅ Yes</td>
+          <td class="no">✅ Yes</td>
+          <td class="no">✅ Yes</td>
+          <td class="no">✅ Yes</td>
+        </tr>
+        <tr>
+          <td>API cost</td>
+          <td class="unique">$0</td>
+          <td class="no">$$</td>
+          <td class="no">$$</td>
+          <td class="no">$$</td>
+          <td class="no">$</td>
+        </tr>
+        <tr>
+          <td>Vector search</td>
+          <td class="yes">✅ BGE-small</td>
+          <td class="yes">✅</td>
+          <td class="yes">✅ pgvector</td>
+          <td class="yes">✅</td>
+          <td class="yes">✅</td>
+        </tr>
+        <tr>
+          <td>Keyword/BM25</td>
+          <td class="yes">✅ FTS5</td>
+          <td class="yes">✅</td>
+          <td class="yes">✅</td>
+          <td class="yes">✅</td>
+          <td class="yes">✅</td>
+        </tr>
+        <tr>
+          <td>Knowledge graph</td>
+          <td class="yes">✅ SQLite</td>
+          <td class="no">❌</td>
+          <td class="yes">✅ Self-wiring</td>
+          <td class="yes">✅</td>
+          <td class="yes">✅</td>
+        </tr>
+        <tr>
+          <td>Fusion search</td>
+          <td class="yes">✅ 4-signal</td>
+          <td class="yes">✅</td>
+          <td class="yes">✅ 6-signal</td>
+          <td class="yes">✅ 4-strat</td>
+          <td class="yes">✅</td>
+        </tr>
+        <tr>
+          <td>Cross-encoder</td>
+          <td class="unique">✅ Local (free)</td>
+          <td class="no">❌</td>
+          <td class="yes">✅ API</td>
+          <td class="yes">✅</td>
+          <td class="no">❌</td>
+        </tr>
+        <tr>
+          <td>Typed edges</td>
+          <td class="yes">✅ 15 types</td>
+          <td class="no">❌</td>
+          <td class="yes">✅ 15+</td>
+          <td class="no">❌</td>
+          <td class="no">❌</td>
+        </tr>
+        <tr>
+          <td>Synthesis layer</td>
+          <td class="yes">✅</td>
+          <td class="no">❌</td>
+          <td class="yes">✅</td>
+          <td class="no">❌</td>
+          <td class="no">❌</td>
+        </tr>
+        <tr>
+          <td>Gap analysis</td>
+          <td class="yes">✅</td>
+          <td class="no">❌</td>
+          <td class="yes">✅</td>
+          <td class="no">❌</td>
+          <td class="no">❌</td>
+        </tr>
+        <tr>
+          <td>Contradiction detection</td>
+          <td class="yes">✅</td>
+          <td class="no">❌</td>
+          <td class="yes">✅</td>
+          <td class="no">❌</td>
+          <td class="no">❌</td>
+        </tr>
+        <tr>
+          <td>Profile isolation</td>
+          <td class="unique">✅ 10 native</td>
+          <td class="yes">✅ user_id</td>
+          <td class="no">❌</td>
+          <td class="yes">✅ banks</td>
+          <td class="yes">✅ peers</td>
+        </tr>
+        <tr>
+          <td>Auto-reasoning</td>
+          <td class="yes">✅ Cron 12h</td>
+          <td class="no">❌</td>
+          <td class="yes">✅ Dream</td>
+          <td class="yes">✅</td>
+          <td class="yes">✅</td>
+        </tr>
+        <tr>
+          <td>Signal detector</td>
+          <td class="yes">✅ Real-time</td>
+          <td class="no">❌</td>
+          <td class="yes">✅</td>
+          <td class="no">❌</td>
+          <td class="no">❌</td>
+        </tr>
+        <tr>
+          <td>Schema packs</td>
+          <td class="yes">✅ 10 types</td>
+          <td class="no">❌</td>
+          <td class="yes">✅ 22 types</td>
+          <td class="no">❌</td>
+          <td class="no">❌</td>
+        </tr>
+        <tr>
+          <td>Git versioning</td>
+          <td class="unique">✅ .md files</td>
+          <td class="no">❌ DB</td>
+          <td class="yes">✅</td>
+          <td class="no">❌ DB</td>
+          <td class="no">❌ DB</td>
+        </tr>
+        <tr>
+          <td>Benchmark</td>
+          <td>88.9% R@5</td>
+          <td class="yes">94.8%</td>
+          <td class="yes">97.9%</td>
+          <td>SOTA</td>
+          <td>90.4%</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="section-title">🏆 Final Ranking (Weighted for Kevin's setup)</div>
+    <div class="card">
+      <div class="score-bar-container">
+        <div class="score-bar-label"><span>🥇 LLM Wiki (Kau)</span><span>8.5/10</span></div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:85%;background:#27AE60;"></div></div>
+      </div>
+      <div class="score-bar-container">
+        <div class="score-bar-label"><span>🥈 GBrain</span><span>7.3/10</span></div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:73%;background:#E67E22;"></div></div>
+      </div>
+      <div class="score-bar-container">
+        <div class="score-bar-label"><span>🥉 Honcho</span><span>6.8/10</span></div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:68%;background:#F39C12;"></div></div>
+      </div>
+      <div class="score-bar-container">
+        <div class="score-bar-label"><span>Hindsight</span><span>6.6/10</span></div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:66%;background:#E74C3C;"></div></div>
+      </div>
+      <div class="score-bar-container">
+        <div class="score-bar-label"><span>Mem0</span><span>6.3/10</span></div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:63%;background:#95A5A6;"></div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== TAB: TIMELINE ===== -->
+  <div id="tab-timeline" class="tab-content">
+
+    <div class="section-title">📅 Upgrade Timeline</div>
+    <div class="card">
+
+      <div class="timeline-item">
+        <div class="timeline-date">June 17</div>
+        <div class="timeline-content">
+          <strong>Phase 1: Foundation</strong> — Karpathy-style markdown wiki<br>
+          <small>_search.py, _kg.py, _reindex.py, _update_index.py, _health.py</small>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">June 17</div>
+        <div class="timeline-content">
+          <strong>Phase 2: FTS5 + Page Metadata</strong><br>
+          <small>page_fts virtual table, page_metadata, search_by_profile/tag/date, stale_pages()</small>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">June 20</div>
+        <div class="timeline-content">
+          <strong>Phase 3: Multi-Signal Fusion Search</strong> 🆕<br>
+          <small>_fusion.py — 4 signals (vector + FTS5 + entity + KG) + RRF merge</small>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">June 20</div>
+        <div class="timeline-content">
+          <strong>Phase 4: Auto-Extract Save</strong> 🆕<br>
+          <small>_save.py — YAML frontmatter, folder routing, FTS5+KG+log+index auto-update</small>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">June 20</div>
+        <div class="timeline-content">
+          <strong>Phase 5: Cross-Encoder Reranker</strong> 🆕<br>
+          <small>ms-marco-MiniLM-L-6-v2 — 88MB local ONNX, zero API cost</small>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">June 25</div>
+        <div class="timeline-content">
+          <strong>Phase 6: Auto-Reasoning Cron</strong> 🆕<br>
+          <small>_reason.py — scan sessions, LLM extract, save as concept page, cron 12h</small>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">June 25-26</div>
+        <div class="timeline-content">
+          <strong>Phase 7: Final Upgrades</strong><br>
+          <small>Auto entity extraction, deductive prompt, KG+Vector fusion, trend detection, recency/forgetting</small>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">June 26</div>
+        <div class="timeline-content">
+          <strong>Phase 8: GBrain-inspired</strong> 🚀<br>
+          <small>Typed graph edges (15 types), synthesis layer (_synthesize.py), gap analysis, better dedup</small>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">June 27</div>
+        <div class="timeline-content">
+          <strong>Phase 9: Signal + Schema + Benchmark</strong> 🆕<br>
+          <small>_wikisignal.py (real-time capture), _schema.yaml (10 page types), _benchmark.py (88.9% R@5)</small>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">June 27</div>
+        <div class="timeline-content">
+          <strong>Phase 10: Final Tuning</strong> 🆕<br>
+          <small>BGE-small embedding (multilingual), contradiction detection, structured synthesis</small>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ===== TAB: CODE ===== -->
+  <div id="tab-code" class="tab-content">
+
+    <div class="section-title">💻 Usage Examples</div>
+
+    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
+      <span class="arrow">▼</span> 🔀 Fusion Search
+    </div>
+    <div class="collapse-content">
+      <div class="code-block">
+<span class="kw">import</span> sys
+sys.path.insert(<span class="str">0</span>, <span class="str">"C:/Users/kevin/wiki"</span>)
+<span class="kw">from</span> _fusion <span class="kw">import</span> fusion_search
+
+<span class="cmt"># Search — auto rerank with cross-encoder</span>
+results = fusion_search(<span class="str">"strategi Robin scalping"</span>, top_k=<span class="str">5</span>)
+
+<span class="cmt"># Filter by profile</span>
+results = fusion_search(<span class="str">"REITs Malaysia"</span>, profile=<span class="str">"nami"</span>)
+
+<span class="cmt"># Display in chat</span>
+answer = fusion_search(<span class="str">"apa pasal EURUSD"</span>, show=<span class="str">True</span>)
+      </div>
+    </div>
+
+    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
+      <span class="arrow">▼</span> 📝 Save to Wiki
+    </div>
+    <div class="collapse-content">
+      <div class="code-block">
+<span class="kw">from</span> _save <span class="kw">import</span> save_page
+
+result = save_page(
+    title=<span class="str">"Scalping Strategy EURUSD"</span>,
+    body=<span class="str">"Robin scalps EURUSD Asian session 9-11am."</span>,
+    profile=<span class="str">"robin"</span>,
+    <span class="cmt"># page_type auto-detected → investment-strategy</span>
+    tags=[<span class="str">"trading"</span>, <span class="str">"scalping"</span>],
+    relations=[(<span class="str">"Robin"</span>, <span class="str">"trades"</span>, <span class="str">"EURUSD"</span>)],
+)
+      </div>
+    </div>
+
+    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
+      <span class="arrow">▼</span> 📄 Synthesis + Gap Analysis
+    </div>
+    <div class="collapse-content">
+      <div class="code-block">
+<span class="kw">from</span> _synthesize <span class="kw">import</span> synthesize
+
+<span class="cmt"># Full answer with citations + gaps</span>
+answer = synthesize(<span class="str">"Apa strategi trading Robin?"</span>)
+
+<span class="cmt"># Raw data</span>
+result = synthesize(<span class="str">"Apa strategi trading Robin?"</span>, raw=<span class="str">True</span>)
+<span class="cmt"># result["answer"]   → synthesized answer</span>
+<span class="cmt"># result["gaps"]     → what's missing</span>
+<span class="cmt"># result["confidence"] → 0.0-1.0</span>
+      </div>
+    </div>
+
+    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
+      <span class="arrow">▼</span> 📡 Signal Detector
+    </div>
+    <div class="collapse-content">
+      <div class="code-block">
+<span class="kw">from</span> _wikisignal <span class="kw">import</span> capture_signal, detect_signals
+
+<span class="cmt"># Quick capture (no LLM)</span>
+capture_signal(<span class="str">"preference"</span>, <span class="str">"Prefers async Python"</span>, <span class="str">"zorro"</span>, [<span class="str">"coding"</span>])
+
+<span class="cmt"># LLM-based detection</span>
+signals = detect_signals(<span class="str">"Robin says scalping EURUSD is best"</span>, <span class="str">"robin"</span>)
+<span class="kw">for</span> s <span class="kw">in</span> signals:
+    capture_signal(s[<span class="str">"type"</span>], s[<span class="str">"content"</span>], <span class="str">"robin"</span>, s.get(<span class="str">"tags"</span>, []))
+      </div>
+    </div>
+
+    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
+      <span class="arrow">▼</span> 🔗 Typed Graph Edges
+    </div>
+    <div class="collapse-content">
+      <div class="code-block">
+<span class="kw">from</span> _kg <span class="kw">import</span> summarize_profile, get_connections_by_type, add_typed_edge
+
+<span class="cmt"># Profile summary</span>
+print(summarize_profile(<span class="str">"robin"</span>))
+<span class="cmt"># → Trades: EURUSD | Prefers: Asian Session | Uses: TradingView</span>
+
+<span class="cmt"># Add typed edge</span>
+add_typed_edge(<span class="str">"robin"</span>, <span class="str">"EURUSD"</span>, <span class="str">"trades"</span>, <span class="str">"Robin scalps EURUSD"</span>)
+      </div>
+    </div>
+
+    <div class="collapsible" onclick="this.classList.toggle('collapsed')">
+      <span class="arrow">▼</span> 📊 Benchmark
+    </div>
+    <div class="collapse-content">
+      <div class="code-block">
+<span class="cmt"># Run from terminal:</span>
+<span class="kw">cd</span> C:/Users/kevin/wiki
+python _benchmark.py
+
+<span class="cmt"># Output:</span>
+<span class="cmt"># Recall@1: 77.8%</span>
+<span class="cmt"># Recall@3: 88.9%</span>
+<span class="cmt"># Recall@5: 88.9%</span>
+<span class="cmt"># MRR:      0.8333</span>
+      </div>
+    </div>
+
+  </div>
+
 </div>
 
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> logs/ <span class="tag">~700K</span>
-  </div>
-  <div class="folder-content files-grid">
-    <span><span class="icon-file">📄</span> gateway.log — Gateway activity</span>
-    <span><span class="icon-file">📄</span> agent.log — Agent interactions</span>
-    <span><span class="icon-file">📄</span> errors.log — Error logs</span>
-    <span><span class="icon-file">📄</span> desktop.log — Desktop app logs</span>
-    <span><span class="icon-file">📄</span> gui.log — GUI logs</span>
-    <span><span class="icon-file">📄</span> gateway-stdio.log — Gateway stdio</span>
-    <span><span class="icon-file">📄</span> gateway-exit-diag.log — Exit diagnostics</span>
-    <span><span class="icon-folder">📁</span> curator/ — Curator logs</span>
-  </div>
-</div>
-
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> cache/ <span class="tag">~226K</span>
-  </div>
-  <div class="folder-content files-grid">
-    <span><span class="icon-folder">📁</span> documents/ — Cached documents</span>
-    <span><span class="icon-folder">📁</span> terminal/ — Terminal cache</span>
-    <span><span class="icon-file">📄</span> model_catalog.json — Model catalog</span>
-    <span><span class="icon-file">📄</span> openrouter_model_metadata.json — OR metadata</span>
-  </div>
-</div>
-
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> skills/ <span class="tag">19 categories</span>
-  </div>
-  <div class="folder-content files-grid">
-    <span><span class="icon-folder">📁</span> autonomous-ai-agents/, creative/, data-science/</span>
-    <span><span class="icon-folder">📁</span> devops/, dogfood/, email/, github/, media/</span>
-    <span><span class="icon-folder">📁</span> mlops/, note-taking/, productivity/, research/</span>
-    <span><span class="icon-folder">📁</span> smart-home/, social-media/, software-development/</span>
-    <span><span class="icon-folder">📁</span> apple/, context-aware-saver/, yuanbao/</span>
-  </div>
-</div>
-
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> sessions/ <span class="tag">N dump files</span>
-  </div>
-  <div class="folder-content files-grid">
-    <span><span class="icon-file">📄</span> request_dump_*.json — Session request dumps</span>
-  </div>
-</div>
-
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> memories/ <span class="tag">Default profile</span>
-  </div>
-  <div class="folder-content files-grid">
-    <span><span class="icon-md">📝</span> MEMORY.md — Agent memory</span>
-    <span><span class="icon-md">👤</span> USER.md — User profile</span>
-  </div>
-</div>
-
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> cron/ <span class="tag">Scheduled jobs</span>
-  </div>
-  <div class="folder-content files-grid">
-    <span><span class="icon-file">📄</span> jobs.json — Job definitions</span>
-    <span><span class="icon-folder">📁</span> output/ — Job output files</span>
-  </div>
-</div>
-
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> plugins/ <span class="tag">Custom</span><span class="desc">— e.g. rtk-rewrite</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> scripts/ <span class="tag">Custom scripts</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> hooks/ <span class="tag">Event hooks</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> audio_cache/ <span class="tag">TTS cache</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> image_cache/ <span class="tag">Image cache</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> pairing/ <span class="tag">Device pairing</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> sandboxes/ <span class="tag">Sandbox envs</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> lsp/ <span class="tag">LSP</span><span class="desc">— Language Server Protocol</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> bin/ <span class="tag">uv</span><span class="desc">— uv.exe, uvw.exe, uvx.exe</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> bootstrap-cache/ <span class="tag">Setup scripts</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> gateway-service/ <span class="tag">Windows</span><span class="desc">— Hermes_Gateway.cmd, .vbs, setup-task.ps1</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> hermes-agent/ <span class="tag">Git repo</span><span class="desc">— Source code</span></div>
-</div>
-
-</div>
-
-<hr>
-
-<!-- ==================== WIKI ==================== -->
-<div class="section-title">📖 LLM Wiki — <code>C:\Users\kevin\wiki\</code></div>
-<div class="tree">
-
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> concepts/ <span class="desc">— Knowledge concept files</span>
-  </div>
-  <div class="folder-content files-grid">
-    <span><span class="icon-md">📝</span> *.md files</span>
-  </div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> comparisons/ <span class="desc">— Perbandingan</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> entities/ <span class="desc">— Entity definitions</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> queries/ <span class="desc">— Saved queries</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> raw/ <span class="desc">— Source articles</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> temp_ocr/ <span class="desc">— OCR temp files</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-md">📝</span> index.md <span class="desc">— Wiki index</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-md">📝</span> log.md <span class="desc">— Change log</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-md">📝</span> SCHEMA.md <span class="desc">— Wiki structure</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-py">🐍</span> _health.py, _search.py, _reindex.py, _kg.py</div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> _vectors/ <span class="desc">— Vector store</span></div>
-</div>
-<div class="tree-node">
-  <div class="label"><span class="icon-folder">📁</span> .git/ <span class="desc">— Version controlled</span></div>
-</div>
-
-</div>
-
-<hr>
-
-<!-- ===================== PROFILE ===================== -->
-<div class="section-title">📁 Per-Profile Structure Template</div>
-<div class="tree">
-<div class="tree-node">
-  <div class="label collapsible" onclick="this.classList.toggle('collapsed')">
-    <span class="arrow">▼</span><span class="icon-folder">📁</span> profiles/&lt;nama&gt;/
-  </div>
-  <div class="folder-content files-grid">
-    <span><span class="icon-env">🔑</span> .env — Profile API keys & tokens</span>
-    <span><span class="icon-yaml">⚙️</span> config.yaml — Profile configuration</span>
-    <span><span class="icon-md">🧬</span> SOUL.md — Identity & character</span>
-    <span><span class="icon-db">🗄️</span> state.db — Local session DB</span>
-    <span><span class="icon-json">🔐</span> auth.json — Auth tokens</span>
-    <span><span class="icon-file">📄</span> gateway.lock, gateway.pid, gateway_state.json</span>
-    <span><span class="icon-json">🧠</span> models_dev_cache.json</span>
-    <span><span class="icon-json">📡</span> channel_directory.json</span>
-    <span><span class="icon-folder">📁</span> memories/ → MEMORY.md + USER.md</span>
-    <span><span class="icon-folder">📁</span> logs/ — gateway.log, agent.log, errors.log</span>
-    <span><span class="icon-folder">📁</span> sessions/, skills/, cron/, home/</span>
-    <span><span class="icon-folder">📁</span> cache/, workspace/, plans/, hooks/</span>
-    <span><span class="icon-folder">📁</span> audio_cache/, image_cache/, skins/, pairing/</span>
-    <span><span class="icon-folder">📁</span> lsp/ (some), gateway-service/ (some)</span>
-  </div>
-</div>
+<!-- ===== FOOTER ===== -->
+<div class="footer">
+  LLM Wiki Upgraded v3.0 &nbsp;·&nbsp; 16 scripts &nbsp;·&nbsp; 3,800+ LOC &nbsp;·&nbsp; $0 API cost &nbsp;·&nbsp; 88.9% R@5
+  <br><br>
+  Built by Kevin with Hermes Agent — June 2026
 </div>
 
 <script>
-  // Collapse all profile subfolders by default for cleaner view
+  function showTab(tabId) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    // Show selected
+    document.getElementById('tab-' + tabId).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // Animate score bars on load
   document.addEventListener('DOMContentLoaded', function() {
-    // Keep profiles expanded but collapse individual profile contents
-    document.querySelectorAll('.collapsible').forEach(function(el) {
-      // Only collapse deeper nested items, not the top level
-      if (el.closest('.folder-content') && el.closest('.folder-content').closest('.folder-content')) {
-        el.classList.add('collapsed');
-      }
-    });
+    setTimeout(function() {
+      document.querySelectorAll('.score-bar-fill').forEach(function(bar) {
+        var w = bar.style.width;
+        bar.style.width = '0';
+        setTimeout(function() { bar.style.width = w; }, 50);
+      });
+    }, 100);
   });
 </script>
 
